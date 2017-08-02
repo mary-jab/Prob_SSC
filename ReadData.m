@@ -24,12 +24,13 @@ elseif (strcmp(input{1}, 'syn') && strcmp(input{2}, 'intersect'))
     
     
 elseif (strcmp(input{1}, 'handwritten'))
-    load('C:\Users\Student\Dropbox\UCF\UCI_MultipleFeaturesDataSet\mfeat\mfeat-fou')
-     load('C:\Users\Student\Dropbox\UCF\UCI_MultipleFeaturesDataSet\mfeat\mfeat-kar')
-     load('C:\Users\Student\Dropbox\UCF\UCI_MultipleFeaturesDataSet\mfeat\mfeat-fac')
-%     load('C:\Users\Student\Dropbox\UCF\UCI_MultipleFeaturesDataSet\mfeat\mfeat-pix')
-%     load('C:\Users\Student\Dropbox\UCF\UCI_MultipleFeaturesDataSet\mfeat\mfeat-zer')
-%     load('C:\Users\Student\Dropbox\UCF\UCI_MultipleFeaturesDataSet\mfeat\mfeat-mor')
+    inputPath = ['../GRealData/UCI_MultipleFeaturesDataSet/mfeat/'];
+    load([inputPath 'mfeat-fou']);
+    load([inputPath 'mfeat-kar']);
+    load([inputPath 'mfeat-fac']);
+    %     load('C:\Users\Student\Dropbox\UCF\UCI_MultipleFeaturesDataSet\mfeat\mfeat-pix')
+    %     load('C:\Users\Student\Dropbox\UCF\UCI_MultipleFeaturesDataSet\mfeat\mfeat-zer')
+    %     load('C:\Users\Student\Dropbox\UCF\UCI_MultipleFeaturesDataSet\mfeat\mfeat-mor')
     Y  = [mfeat_fou mfeat_fac mfeat_kar]';% mfeat_mor mfeat_pix mfeat_zer]';
     numCls = 2;
     Y = Y(:,1:200*numCls);
@@ -39,9 +40,9 @@ elseif (strcmp(input{1}, 'handwritten'))
         s = [s, ones(1, clsSize)*i];
     end
     savePath = ['savedRes/UCI_MultipleFeaturesDataSet/numCls' num2str(numCls) '_featureSize' num2str(size(Y,1)) '/'];
-
-end
     
+end
+
 end
 
 

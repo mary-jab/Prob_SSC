@@ -27,7 +27,7 @@ t_start = tic;
 % Global constants and defaults
 
 QUIET    = 1;
-MAC_ITER = 1500;
+MAC_ITER = 500;
 ABSTOL   = 1e-6;
 RELTOL   = 1e-4;
 
