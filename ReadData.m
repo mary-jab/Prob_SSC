@@ -24,10 +24,15 @@ elseif (strcmp(input{1}, 'syn') && strcmp(input{2}, 'intersect'))
     
     
 elseif (strcmp(input{1}, 'handwritten'))
-    inputPath = ['../GRealData/UCI_MultipleFeaturesDataSet/mfeat/'];
-    load([inputPath 'mfeat-fou']);
-    load([inputPath 'mfeat-kar']);
-    load([inputPath 'mfeat-fac']);
+    if ~isdeployed
+        inputPath = '../GRealData/UCI_MultipleFeaturesDataSet/mfeat/';
+    else
+        [inputPath,name]=fileparts(which('mfeat-fou'));
+        %         inputPath = opt.pathstr;
+    end
+    load([inputPath '/mfeat-fou']);
+    load([inputPath '/mfeat-kar']);
+    load([inputPath '/mfeat-fac']);
     %     load('C:\Users\Student\Dropbox\UCF\UCI_MultipleFeaturesDataSet\mfeat\mfeat-pix')
     %     load('C:\Users\Student\Dropbox\UCF\UCI_MultipleFeaturesDataSet\mfeat\mfeat-zer')
     %     load('C:\Users\Student\Dropbox\UCF\UCI_MultipleFeaturesDataSet\mfeat\mfeat-mor')
