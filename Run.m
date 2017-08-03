@@ -29,5 +29,16 @@ runOpt.SSCrho = 1;
 % runOpt.errorPrc =errorPrc;
 runOpt.k = opt.clas;
 
+if isdeployed
+    
+    SAVEPATH=strcat(pwd,filesep,'output');
+    if ( ~isdir(SAVEPATH))
+        mkdir(SAVEPATH);
+    end
+    nameF =strcat('normType', num2str(opt.dim), 'results.mat');
+    save(fullfile(SAVEPATH,  nameF), 'DataType' );
+end
+
+
 Prob_itterative_SSC(Y, runOpt.GrndTrth  ,runOpt);
 % end

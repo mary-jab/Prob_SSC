@@ -37,7 +37,7 @@ elseif (strcmp(input{1}, 'handwritten'))
     %     load('C:\Users\Student\Dropbox\UCF\UCI_MultipleFeaturesDataSet\mfeat\mfeat-zer')
     %     load('C:\Users\Student\Dropbox\UCF\UCI_MultipleFeaturesDataSet\mfeat\mfeat-mor')
     Y  = [mfeat_fou mfeat_fac mfeat_kar]';% mfeat_mor mfeat_pix mfeat_zer]';
-    numCls = 10;
+    numCls = 2;
     Y = Y(:,1:200*numCls);
     clsSize = size(Y,2)/numCls;
     s = [];

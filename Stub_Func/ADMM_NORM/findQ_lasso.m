@@ -62,7 +62,8 @@ for it = 1:n
         else            % if fat
             qi = q/rho - (zi*(U \ ( L \ (zi'*q) )))/rho^2;
         end
-        qi = pos(qi);
+%         qi = pos(qi);
+        qi = abs(qi);
         qi = qi/max(qi);
         % z-update with relaxation
         zold = c;
