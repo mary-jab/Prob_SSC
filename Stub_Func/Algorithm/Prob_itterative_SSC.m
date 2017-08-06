@@ -41,7 +41,7 @@ for normType = [2, 1]
         lambda1Lst{i}=[];
         thrshPrc{i}=[];
         for lambda0 = lambda0_currLst
-            lambda1_currLst = [ lambda0*.0001, lambda0*.0005 lambda0*.001 lambda0*.01];%, lambda0*.02];
+            lambda1_currLst = [ lambda0*.0001 lambda0*.001 lambda0*.01];%, lambda0*.02];
             for lambda1 = lambda1_currLst
                 [cZ, cZKSym, cclusters, cclustersErr,CMissrate, cinputOpt] =  mainProcess...
                     (Y, numClass, preQ, preZ, lambda0,lambda1, clusterPre, inputOpt, rho, alpha, normType);
@@ -67,6 +67,13 @@ for normType = [2, 1]
         isNanMat(i) = sum(isnan(clustersErr))/N;
         QMat        = findQ(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha);
         %         [sPath] = plotFigure (QMat,ZKSym, missrate(i), options, 11, clustersErr, 0);
+        
+        SAVEPATH=strcat(pwd,filesep,'output');
+        if ( ~isdir(SAVEPATH))
+            mkdir(SAVEPATH);
+        end
+        nameF =strcat('normType', num2str(normType), 'results_iter', num2str(i), '.mat');
+        save(fullfile(SAVEPATH,  nameF), 'Z', 'ZKSym','lambda0Lst', 'lambda1Lst', 'thrshPrc', 'missrate', 'QMatLst' );
         
         if (i>1 && isNanMat(i) >= isNanMat(i-1))
             break;
