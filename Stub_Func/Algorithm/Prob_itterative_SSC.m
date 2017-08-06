@@ -68,12 +68,6 @@ for normType = [2, 1]
         QMat        = findQ(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha);
         %         [sPath] = plotFigure (QMat,ZKSym, missrate(i), options, 11, clustersErr, 0);
         
-        SAVEPATH=strcat(pwd,filesep,'output');
-        if ( ~isdir(SAVEPATH))
-            mkdir(SAVEPATH);
-        end
-        nameF =strcat('normType', num2str(normType), 'results_iter', num2str(i), '.mat');
-        save(fullfile(SAVEPATH,  nameF), 'Z', 'ZKSym','lambda0Lst', 'lambda1Lst', 'thrshPrc', 'missrate', 'QMatLst' );
         
         if (i>1 && isNanMat(i) >= isNanMat(i-1))
             break;
@@ -82,7 +76,15 @@ for normType = [2, 1]
         preZ = Z;
         clusterPre = clusters;
         QMatLst{i} = QMat;
+       
         
+        SAVEPATH=strcat(pwd,filesep,'output');
+        if ( ~isdir(SAVEPATH))
+            mkdir(SAVEPATH);
+        end
+        nameF =strcat('normType', num2str(normType), 'results_iter', num2str(i), '.mat');
+        save(fullfile(SAVEPATH,  nameF), 'Z', 'ZKSym','missrate', 'QMat' );
+       
     end
     if ~isdeployed
         mkdir(options.savePath)
