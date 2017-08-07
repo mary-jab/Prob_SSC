@@ -26,10 +26,10 @@ for normType = [2, 1]
     clusters = [];
     preZ = zeros(N,N);
     clusterPre = clusters;
-    
+    thrshPrc = [];
     
     %% iterative step
-    for i=1:10
+    for i=1:5
         lambda0_currLst = .1;
         
         inputOpt.errorPre = clustersErr;
@@ -41,7 +41,7 @@ for normType = [2, 1]
         lambda1Lst{i}=[];
         thrshPrc{i}=[];
         for lambda0 = lambda0_currLst
-            lambda1_currLst = [ lambda0*.0001 lambda0*.001 lambda0*.01];%, lambda0*.02];
+            lambda1_currLst = [ lambda0*.0001 ];%, lambda0*.02]; lambda0*.01   lambda0*.001
             for lambda1 = lambda1_currLst
                 [cZ, cZKSym, cclusters, cclustersErr,CMissrate, cinputOpt] =  mainProcess...
                     (Y, numClass, preQ, preZ, lambda0,lambda1, clusterPre, inputOpt, rho, alpha, normType);
