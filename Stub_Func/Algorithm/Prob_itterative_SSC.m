@@ -76,7 +76,6 @@ for normType = [2, 1]
         preZ = Z;
         clusterPre = clusters;
         QMatLst{i} = QMat;
-       
         
         SAVEPATH=strcat(pwd,filesep,'output');
         if ( ~isdir(SAVEPATH))
@@ -84,7 +83,6 @@ for normType = [2, 1]
         end
         nameF =strcat('Iter_normType', num2str(normType),'N', num2str(N), 'results_iter', num2str(i), '.mat');
         save(fullfile(SAVEPATH,  nameF), 'Z', 'ZKSym','missrate', 'QMat' );
-       
     end
     if ~isdeployed
         mkdir(options.savePath)
