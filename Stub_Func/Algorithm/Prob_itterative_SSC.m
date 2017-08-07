@@ -82,7 +82,7 @@ for normType = [2, 1]
         if ( ~isdir(SAVEPATH))
             mkdir(SAVEPATH);
         end
-        nameF =strcat('normType', num2str(normType),'N', num2str(N), 'results_iter', num2str(i), '.mat');
+        nameF =strcat('Iter_normType', num2str(normType),'N', num2str(N), 'results_iter', num2str(i), '.mat');
         save(fullfile(SAVEPATH,  nameF), 'Z', 'ZKSym','missrate', 'QMat' );
        
     end
