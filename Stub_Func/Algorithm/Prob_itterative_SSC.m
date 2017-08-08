@@ -17,7 +17,7 @@ inputOpt.s = s;
 
 %% Algorithm
 %% first Step
-for normType = [2, 1]
+for normType = [1]
     rho = 1.0;
     alpha=1.0;
     lambda0 = .05;%.05;%.05;
@@ -30,7 +30,7 @@ for normType = [2, 1]
     
     %% iterative step
     SAVEPATH=strcat(pwd,filesep,'output');
-    for i=1:5
+    for i=1:10
         nameF =strcat('Iter_normType', num2str(normType),'N', num2str(N), 'results_iter', num2str(i), '.mat');
         if (exist(fullfile(SAVEPATH,  nameF), 'file'))
             load(fullfile(SAVEPATH,  nameF));
@@ -44,7 +44,11 @@ for normType = [2, 1]
             lambda1Lst{i}=[];
             thrshPrc{i}=[];
             for lambda0 = lambda0_currLst
-                lambda1_currLst = [ lambda0*.0001 ];%, lambda0*.02]; lambda0*.01   lambda0*.001
+                lambda1_currLst = [ lambda0*.0001 ];%, lambda0*.02]; lambda0*.01
+                if i >1
+                    lambda1_currLst = [ lambda0*.0001 lambda0*.001];%, lambda0*.02]; lambda0*.01
+                end
+                
                 for lambda1 = lambda1_currLst
                     [cZ, cZKSym, cclusters, cclustersErr,CMissrate, cinputOpt] =  mainProcess...
                         (Y, numClass, preQ, preZ, lambda0,lambda1, clusterPre, inputOpt, rho, alpha, normType);
@@ -75,7 +79,7 @@ for normType = [2, 1]
             end
             save(fullfile(SAVEPATH,  nameF), 'Z', 'ZKSym','missrate','isNanMat', 'QMat' );
         end
-        if (i>1 && isNanMat(i) >= isNanMat(i-1))
+        if (i>2 && isNanMat(i) >= isNanMat(i-1))
             break;
         end
         preQ = QMat;
@@ -83,20 +87,13 @@ for normType = [2, 1]
         clusterPre = clusters;
         QMatLst{i} = QMat;
     end
-    if ~isdeployed
-        mkdir(options.savePath)
-        save ([options.savePath 'normType' num2str(normType) 'results.mat'],...
-            'Z', 'ZKSym','lambda0Lst', 'lambda1Lst', 'thrshPrc', 'missrate', 'QMatLst' );
-    else
-        SAVEPATH=strcat(pwd,filesep,'output');
-        if ( ~isdir(SAVEPATH))
-            mkdir(SAVEPATH);
-        end
-        nameF =strcat('normType', num2str(normType), 'N', num2str(N),'results.mat');
-        save(fullfile(SAVEPATH,  nameF), 'Z', 'ZKSym','lambda0Lst', 'lambda1Lst', 'thrshPrc', 'missrate', 'QMatLst' );
-        %         nameF = ['normType' num2str(normType) 'results.mat'];
-        %         save(fullfile(ctfroot, mfilename, nameF), 'Z', 'ZKSym','lambda0Lst', 'lambda1Lst', 'thrshPrc', 'missrate', 'QMatLst' , '-append');
+    SAVEPATH=strcat(pwd,filesep,'output');
+    if ( ~isdir(SAVEPATH))
+        mkdir(SAVEPATH);
     end
+    nameF =strcat('normType', num2str(normType), 'N', num2str(N),'results.mat');
+    save(fullfile(SAVEPATH,  nameF), 'Z', 'ZKSym','lambda0Lst', 'lambda1Lst', 'thrshPrc', 'missrate', 'QMatLst' );
+    
     close all
 end
 end
@@ -333,21 +330,21 @@ end
 % %
 % function [result] = Prob_itterative_SSC(Y, s, options)
 % Debug = 1;
-% 
+%
 % numClass = options.k;
 % %% run
 % result = [];
 % N = length(s);
 % lambda2= 1.2;
 % clustersErr = nan(N,1);
-% 
+%
 % errorProb = [];
 % %% save 1st Step
 % iter =1;
 % inputOpt.iter = iter;
 % inputOpt.errorPre=clustersErr;
 % inputOpt.s = s;
-% 
+%
 % %% Algorithm
 % %% first Step
 % for normType = [2, 1]
@@ -360,7 +357,7 @@ end
 %     preZ = zeros(N,N);
 %     clusterPre = clusters;
 %     thrshPrc = [];
-%     
+%
 %     %% iterative step
 %     SAVEPATH=strcat(pwd,filesep,'output');
 %     for i=1:5
@@ -433,7 +430,7 @@ end
 %     close all
 % end
 % end
-% 
+%
 % function [Z, ZKSym, clusters, clustersErr,missrate, inputOpt] = ...
 %     mainProcess(Y, numClass, preQ, preZ, lambda0,lambda1, clusterPre, inputOpt, rho, alpha, normType)
 % [Z, ZKSym] = myLasso(Y, preQ, preZ, lambda0,lambda1, rho, alpha, normType);
@@ -441,9 +438,9 @@ end
 %     Prob_Clustering(Y, ZKSym, numClass, clusterPre, inputOpt);
 % missrate = Misclassification(clusters, inputOpt.GrndTrth); % it is an approximate way to calculate ACC.
 % end
-% 
-% 
-% 
+%
+%
+%
 % %
 % %
 % %
