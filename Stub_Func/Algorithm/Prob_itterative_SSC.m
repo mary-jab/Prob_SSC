@@ -29,46 +29,52 @@ for normType = [2, 1]
     thrshPrc = [];
     
     %% iterative step
+    SAVEPATH=strcat(pwd,filesep,'output');
     for i=1:5
-        lambda0_currLst = .1;
-        
-        inputOpt.errorPre = clustersErr;
-        inputOpt.itt = i;
-        inputOpt.GrndTrth = options.GrndTrth;
-        
-        missrate(i) = 1;
-        lambda0Lst{i}=[];
-        lambda1Lst{i}=[];
-        thrshPrc{i}=[];
-        for lambda0 = lambda0_currLst
-            lambda1_currLst = [ lambda0*.0001 ];%, lambda0*.02]; lambda0*.01   lambda0*.001
-            for lambda1 = lambda1_currLst
-                [cZ, cZKSym, cclusters, cclustersErr,CMissrate, cinputOpt] =  mainProcess...
-                    (Y, numClass, preQ, preZ, lambda0,lambda1, clusterPre, inputOpt, rho, alpha, normType);
-                if CMissrate < missrate(i)
-                    Z=cZ;
-                    ZKSym= cZKSym;
-                    clusters = cclusters;
-                    clustersErr = cclustersErr;
-                    inputOpt=cinputOpt;
-                    if (CMissrate < missrate(i) && ~isempty(lambda0Lst{i}))
-                        lambda0Lst{i}(end) = lambda0;
-                        lambda1Lst{i}(end) = lambda1;
-                        thrshPrc{i}(end) = inputOpt.thresholdPRC;
-                    else
-                        lambda0Lst{i}(end+1) = lambda0;
-                        lambda1Lst{i}(end+1) = lambda1;
-                        thrshPrc{i}(end+1) = inputOpt.thresholdPRC;
+        nameF =strcat('Iter_normType', num2str(normType),'N', num2str(N), 'results_iter', num2str(i), '.mat');
+        if (exist(fullfile(SAVEPATH,  nameF), 'file'))
+            load(fullfile(SAVEPATH,  nameF));
+        else
+            lambda0_currLst = .1;
+            inputOpt.errorPre = clustersErr;
+            inputOpt.itt = i;
+            inputOpt.GrndTrth = options.GrndTrth;
+            missrate(i) = 1;
+            lambda0Lst{i}=[];
+            lambda1Lst{i}=[];
+            thrshPrc{i}=[];
+            for lambda0 = lambda0_currLst
+                lambda1_currLst = [ lambda0*.0001 ];%, lambda0*.02]; lambda0*.01   lambda0*.001
+                for lambda1 = lambda1_currLst
+                    [cZ, cZKSym, cclusters, cclustersErr,CMissrate, cinputOpt] =  mainProcess...
+                        (Y, numClass, preQ, preZ, lambda0,lambda1, clusterPre, inputOpt, rho, alpha, normType);
+                    if CMissrate < missrate(i)
+                        Z=cZ;
+                        ZKSym= cZKSym;
+                        clusters = cclusters;
+                        clustersErr = cclustersErr;
+                        inputOpt=cinputOpt;
+                        if (CMissrate < missrate(i) && ~isempty(lambda0Lst{i}))
+                            lambda0Lst{i}(end) = lambda0;
+                            lambda1Lst{i}(end) = lambda1;
+                            thrshPrc{i}(end) = inputOpt.thresholdPRC;
+                        else
+                            lambda0Lst{i}(end+1) = lambda0;
+                            lambda1Lst{i}(end+1) = lambda1;
+                            thrshPrc{i}(end+1) = inputOpt.thresholdPRC;
+                        end
+                        missrate(i) = CMissrate;
                     end
-                    missrate(i) = CMissrate;
                 end
             end
+            isNanMat(i) = sum(isnan(clustersErr))/N;
+            QMat        = findQ(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha);
+            %         [sPath] = plotFigure (QMat,ZKSym, missrate(i), options, 11, clustersErr, 0);
+            if ( ~isdir(SAVEPATH))
+                mkdir(SAVEPATH);
+            end
+            save(fullfile(SAVEPATH,  nameF), 'Z', 'ZKSym','missrate', 'QMat' );
         end
-        isNanMat(i) = sum(isnan(clustersErr))/N;
-        QMat        = findQ(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha);
-        %         [sPath] = plotFigure (QMat,ZKSym, missrate(i), options, 11, clustersErr, 0);
-        
-        
         if (i>1 && isNanMat(i) >= isNanMat(i-1))
             break;
         end
@@ -76,13 +82,6 @@ for normType = [2, 1]
         preZ = Z;
         clusterPre = clusters;
         QMatLst{i} = QMat;
-        
-        SAVEPATH=strcat(pwd,filesep,'output');
-        if ( ~isdir(SAVEPATH))
-            mkdir(SAVEPATH);
-        end
-        nameF =strcat('Iter_normType', num2str(normType),'N', num2str(N), 'results_iter', num2str(i), '.mat');
-        save(fullfile(SAVEPATH,  nameF), 'Z', 'ZKSym','missrate', 'QMat' );
     end
     if ~isdeployed
         mkdir(options.savePath)
