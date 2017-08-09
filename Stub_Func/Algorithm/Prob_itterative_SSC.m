@@ -29,7 +29,7 @@ for normType = [1]
     thrshPrc = [];
     
     %% iterative step
-    SAVEPATH=strcat(pwd,filesep,'output');
+    SAVEPATH=strcat(pwd,filesep,options.savePath);
     for i=1:10
         nameF =strcat('Iter_normType', num2str(normType),'N', num2str(N), 'results_iter', num2str(i), '.mat');
         if (exist(fullfile(SAVEPATH,  nameF), 'file'))
@@ -87,13 +87,13 @@ for normType = [1]
         clusterPre = clusters;
         QMatLst{i} = QMat;
     end
-    SAVEPATH=strcat(pwd,filesep,'output');
+    
     if ( ~isdir(SAVEPATH))
         mkdir(SAVEPATH);
     end
     nameF =strcat('normType', num2str(normType), 'N', num2str(N),'results.mat');
     save(fullfile(SAVEPATH,  nameF), 'Z', 'ZKSym','lambda0Lst', 'lambda1Lst', 'thrshPrc', 'missrate', 'QMatLst' );
-    
+    mkdir ([ SAVEPATH '/tmp']); movefile([ SAVEPATH '/Iter*.*'], [ SAVEPATH '/tmp/']);
     close all
 end
 end
