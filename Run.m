@@ -24,12 +24,12 @@ opt.noise = .3;
 for errorPrc = 20/100: 10/100:90/100;
     opt.noise =errorPrc;
     for instance = 1:20
-        opt.samNum = 1;
-        [Y, runOpt.GrndTrth , runOpt.savePath] = ReadData (DataType, opt);
-        opt.clas = max(runOpt.GrndTrth);
-        runOpt.SSCrho = 1;
-        runOpt.k = opt.clas;
+        opt.sample = instance;
+        [Y, opt.GrndTrth , opt.savePath] = ReadData (DataType, opt);
+        k = max(opt.GrndTrth);
+        opt.SSCrho = 1;
+        opt.k = k;
         
-        Prob_itterative_SSC(Y, runOpt.GrndTrth  ,runOpt);
+        Prob_itterative_SSC(Y, opt.GrndTrth  ,opt);
     end
 end

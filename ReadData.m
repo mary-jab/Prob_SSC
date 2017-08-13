@@ -3,7 +3,7 @@ function [Y, s, savePath] = ReadData( input, opt)
 if (strcmp(input{1}, 'syn') && strcmp(input{2}, 'GuassianNoise'))
     inputPath = ['../Generate_SyntheticData/genData/GuassianNoise_Cls_' num2str(opt.clas) '/'];
     fileName =  [ inputPath 'Subspace_GuassNoise_Cls_' num2str(opt.clas) '_dim_' ...
-        num2str(opt.dim) '_ambient_' num2str(opt.amb) '_noisePrc_' num2str(opt.noise) '_' num2str(opt.samNum) '.mat'];
+        num2str(opt.dim) '_ambient_' num2str(opt.amb) '_noisePrc_' num2str(opt.noise) '_' num2str(opt.sample) '.mat'];
     load (fileName);
     [n, N1, numGrps] = size(Y);
     N= N1*numGrps;

@@ -31,11 +31,15 @@ for normType = [2]
     %% iterative step
     SAVEPATH=strcat(pwd,filesep,options.savePath);
     for i=1:10
-        nameF =strcat('Iter_normType', num2str(normType),'N', num2str(N), 'results_iter', num2str(i), '.mat');
+        nameF =strcat('Iter_normType', num2str(normType),'N', num2str(N) );
+        if (isfield(options,'sample'))
+             nameF =strcat(nameF, 'sample', num2str(options.sample));
+        end
+        nameF =strcat(nameF, '_iter', num2str(i), '.mat');
         if (exist(fullfile(SAVEPATH,  nameF), 'file'))
             load(fullfile(SAVEPATH,  nameF));
         else
-            lambda0_currLst = [.005 .05  0.1]; %.1  .05
+            lambda0_currLst = [.001 .005 .05  0.1]; %.1  .05
             inputOpt.errorPre = clustersErr;
             inputOpt.itt = i;
             inputOpt.GrndTrth = options.GrndTrth;
@@ -96,7 +100,14 @@ for normType = [2]
     if ( ~isdir(SAVEPATH))
         mkdir(SAVEPATH);
     end
-    nameF =strcat('normType', num2str(normType), 'N', num2str(N),'results.mat');
+    nameF =strcat('normType', num2str(normType), 'N', num2str(N));
+    if (isfield(options,'sample'))
+        nameF =strcat(nameF, 'sample', num2str(options.sample));
+    end
+    nameF =strcat(nameF, '.mat');
+
+    
+    
     save(fullfile(SAVEPATH,  nameF), 'Z', 'ZKSym','lambda0Lst', 'lambda1Lst', 'thrshPrc', 'missrate', 'QMatLst' );
     mkdir ([ SAVEPATH '/tmp']); movefile([ SAVEPATH '/Iter*.*'], [ SAVEPATH '/tmp/']);
     close all
