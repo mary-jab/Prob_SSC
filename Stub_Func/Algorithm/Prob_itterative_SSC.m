@@ -39,7 +39,7 @@ for normType = [2]
         if (exist(fullfile(SAVEPATH,  nameF), 'file'))
             load(fullfile(SAVEPATH,  nameF));
         else
-            lambda0_currLst = [.001 .005 .05  0.1]; %.1  .05
+            lambda0_currLst = [.0001 .001 .005 .05  0.1]; %.1  .05
             inputOpt.errorPre = clustersErr;
             inputOpt.itt = i;
             inputOpt.GrndTrth = options.GrndTrth;

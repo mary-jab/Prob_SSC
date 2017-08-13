@@ -13,14 +13,12 @@ clusters= NCutCluster(ZKSym, maxCluster);
 %% projection error
 % [errorPrbMat, errRatio, errRatioIDX, minErrProb, pickedClstr]= calProjErr (Y, clusters, maxCluster);
 [errorPrbMat, errRatio, errRatioIDX, minErrProb, pickedClstr]= CalcNormErr(ZKSym, clusters, maxCluster);
-if sum(isnan(errorPrbMat(:)))
-    jhfjd=0;
-end
+
 i = 1;
 minMis = 1;
 % if isfield(options, 'sortedArr')==0 
 % end
-for prc = [.9:-.05:.05 0.01]   
+for prc = [.95:-.05:.05]   
     options.sortedArr = sort(errRatio);
     options.BaseTheshold  = options.sortedArr(uint16(prc*N));
     theshold =options.BaseTheshold/(options.itt);%sortedArr(uint16((.9-(options.itt-1)*.1)*N));% *maxCluster);
