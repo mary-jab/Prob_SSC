@@ -17,7 +17,7 @@ inputOpt.s = s;
 
 %% Algorithm
 %% first Step
-for normType = [1]
+for normType = [2, 1]
     rho = 1.0;
     alpha=1.0;
     lambda0 = .05;%.05;%.05;
@@ -35,7 +35,7 @@ for normType = [1]
         if (exist(fullfile(SAVEPATH,  nameF), 'file'))
             load(fullfile(SAVEPATH,  nameF));
         else
-            lambda0_currLst = .1;
+            lambda0_currLst = [.01 .05 .1]; %.1
             inputOpt.errorPre = clustersErr;
             inputOpt.itt = i;
             inputOpt.GrndTrth = options.GrndTrth;
@@ -72,16 +72,17 @@ for normType = [1]
                 end
             end
             isNanMat(i) = sum(isnan(clustersErr))/N;
-            QMat        = findQ(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha);
-            %         [sPath] = plotFigure (QMat,ZKSym, missrate(i), options, 11, clustersErr, 0);
+            QMat        = findQ_prob(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha, inputOpt);
+%             QMat        = findQ(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha);
+                    [sPath] = plotFigure (QMat,ZKSym, missrate(i), options, 11, clustersErr, 0);
             if ( ~isdir(SAVEPATH))
                 mkdir(SAVEPATH);
             end
-            save(fullfile(SAVEPATH,  nameF), 'Z', 'ZKSym','missrate','isNanMat', 'QMat' );
+            save(fullfile(SAVEPATH,  nameF), 'Z', 'ZKSym','missrate','isNanMat', 'QMat', 'thrshPrc' );
         end
-        if (i>2 && isNanMat(i) >= isNanMat(i-1))
-            break;
-        end
+%         if (i>2 && isNanMat(i) >= isNanMat(i-1))
+%             break;
+%         end
         preQ = QMat;
         preZ = Z;
         clusterPre = clusters;
@@ -93,7 +94,7 @@ for normType = [1]
     end
     nameF =strcat('normType', num2str(normType), 'N', num2str(N),'results.mat');
     save(fullfile(SAVEPATH,  nameF), 'Z', 'ZKSym','lambda0Lst', 'lambda1Lst', 'thrshPrc', 'missrate', 'QMatLst' );
-    
+    mkdir ([ SAVEPATH '/tmp']); movefile([ SAVEPATH '/Iter*.*'], [ SAVEPATH '/tmp/']);
     close all
 end
 end
@@ -101,8 +102,9 @@ end
 function [Z, ZKSym, clusters, clustersErr,missrate, inputOpt] = ...
     mainProcess(Y, numClass, preQ, preZ, lambda0,lambda1, clusterPre, inputOpt, rho, alpha, normType)
 [Z, ZKSym] = myLasso(Y, preQ, preZ, lambda0,lambda1, rho, alpha, normType);
-[clusters, clustersErr, minErrProb, errorPrbMat,inputOpt] = ...
+[clusters, clustersErr, minErrProb,errorPrbMat,inputOpt] = ...
     Prob_Clustering(Y, ZKSym, numClass, clusterPre, inputOpt);
+inputOpt.errorPrbMat=errorPrbMat;
 missrate = Misclassification(clusters, inputOpt.GrndTrth); % it is an approximate way to calculate ACC.
 end
 

@@ -18,9 +18,9 @@ if sum(isnan(errorPrbMat(:)))
 end
 i = 1;
 minMis = 1;
-% if isfield(options, 'sortedArr')==0 
+% if isfield(options, 'sortedArr')==0
 % end
-for prc = [.9:-.05:.05 0.01]   
+for prc = [.9:-.01:.01]   
     options.sortedArr = sort(errRatio);
     options.BaseTheshold  = options.sortedArr(uint16(prc*N));
     theshold =options.BaseTheshold/(options.itt);%sortedArr(uint16((.9-(options.itt-1)*.1)*N));% *maxCluster);

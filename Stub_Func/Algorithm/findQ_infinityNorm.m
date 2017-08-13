@@ -1,4 +1,4 @@
-function [QMat] = findQ(clusters, ZKSym, lambda0, lambda1, rho, alpha)
+function [QMat] = findQ_infinityNorm(clusters, ZKSym, lambda0, lambda1, rho, alpha)
 N = length(clusters);
 QMatCls = zeros(N,N);
 %% clusters
@@ -11,7 +11,10 @@ for i=1:N,
     end
 end
 %% threshold
-QMatThsh = updateQ(ZKSym, clusters, N, lambda0, lambda1, rho, alpha);
+QMatThsh = updateCVX_inf(ZKSym, QMatCls,clusters, lambda0,lambda1 );
+
+
+% QMatThsh = updateQ(ZKSym, clusters, N, lambda0, lambda1, rho, alpha);
 
 QMat = QMatThsh+QMatCls;%(QMatThsh|QMatCls)*(1+eps);%(QMatThsh|QMatCls)*(1+eps);%
 end
@@ -60,20 +63,28 @@ end
 
 end
 
-function QMat = updateCVX(NanZ, lambda0,lambda1 ,N, Nan_count)
+function QMatNan = updateCVX_inf(NanZ, QMatCls,clusters, lambda0,lambda1 )
 
+nanID = isnan(clusters);
+Nan_count = sum(nanID);
+N = length(clusters);
+certainQ = QMatCls(:,~nanID);
 
 cvx_begin quiet;
 variable QMat(N,Nan_count)
 expressions YY(Nan_count)
 for i = 1 : Nan_count,
+    
     YY(i)= lambda1 * norm( (1-QMat(:,i)) .* NanZ(:,i), 2);
 end
-minimize( sum( (YY))+ lambda0* norm(QMat,1));%+ lambda2 *sum(X) );%) sum(X(:))
+minimize( sum( (YY))+ lambda0* norm([certainQ,QMat],inf));%+ lambda2 *sum(X) );%) sum(X(:))
 subject to
-%sum( QMat,1)==1;
+% sum( QMat,1)==1;
 QMat>=0;
 QMat<=1;
 cvx_end;
+QMat(QMat<.09) = 0;
+QMatNan = zeros(N,N);
+QMatNan(:,nanID) = QMat;
 
 end

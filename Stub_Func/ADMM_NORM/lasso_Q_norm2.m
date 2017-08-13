@@ -107,11 +107,11 @@ function [L, U] = factor(A,Q, lambda2, rho)
 %% association matrix
 aM =2*lambda2*(1-Q)'*(1-Q);
 
-% if ( m >= n )    % if skinny
+%  if ( m >= n )    % if skinny
     L = chol( A'*A + aM +rho*speye(n), 'lower' );
-% else            % if fat
-%     L = chol( speye(m) + 1/rho*(A*A') , 'lower' );
-% end
+%  else            % if fat
+%      L = chol( speye(m) + 1/rho*((A*A') +aM) , 'lower' );
+%  end
 
 % force matlab to recognize the upper / lower triangular structure
 L = sparse(L);

@@ -9,7 +9,7 @@ DataType{2} = 'GuassianNoise';
 opt.clas = 15;
 opt.dim = 5;
 opt.amb = 100;
-% opt.noise = .2;
+opt.noise = .3;
 %% Intersection
 % DataType{1} = 'syn';
 % DataType{2} = 'intersect';
@@ -17,7 +17,7 @@ opt.amb = 100;
 % opt.dim = 10;
 % opt.amb = 200;
 %% handwritten
-DataType{1} = 'handwritten';
+% DataType{1} = 'handwritten';
 
 %%
 opt.samNum = 1;
@@ -28,17 +28,6 @@ opt.clas = max(runOpt.GrndTrth);
 runOpt.SSCrho = 1;
 % runOpt.errorPrc =errorPrc;
 runOpt.k = opt.clas;
-
-if isdeployed
-    
-    SAVEPATH=strcat(pwd,filesep,'output');
-    if ( ~isdir(SAVEPATH))
-        mkdir(SAVEPATH);
-    end
-    nameF =strcat('normType', num2str(opt.dim), 'results.mat');
-    save(fullfile(SAVEPATH,  nameF), 'DataType' );
-end
-
 
 Prob_itterative_SSC(Y, runOpt.GrndTrth  ,runOpt);
 % end
