@@ -20,14 +20,16 @@ opt.noise = .3;
 % DataType{1} = 'handwritten';
 
 %%
-opt.samNum = 1;
 
-% for errorPrc = 20/100: 10/100:90/100;
-[Y, runOpt.GrndTrth , runOpt.savePath] = ReadData (DataType, opt);
-opt.clas = max(runOpt.GrndTrth);
-runOpt.SSCrho = 1;
-% runOpt.errorPrc =errorPrc;
-runOpt.k = opt.clas;
-
-Prob_itterative_SSC(Y, runOpt.GrndTrth  ,runOpt);
-% end
+for errorPrc = 20/100: 10/100:90/100;
+    opt.noise =errorPrc;
+    for instance = 1:20
+        opt.samNum = 1;
+        [Y, runOpt.GrndTrth , runOpt.savePath] = ReadData (DataType, opt);
+        opt.clas = max(runOpt.GrndTrth);
+        runOpt.SSCrho = 1;
+        runOpt.k = opt.clas;
+        
+        Prob_itterative_SSC(Y, runOpt.GrndTrth  ,runOpt);
+    end
+end
