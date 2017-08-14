@@ -33,13 +33,13 @@ for normType = [2]
     for i=1:10
         nameF =strcat('Iter_normType', num2str(normType),'N', num2str(N) );
         if (isfield(options,'sample'))
-             nameF =strcat(nameF, 'sample', num2str(options.sample));
+            nameF =strcat(nameF, 'sample', num2str(options.sample));
         end
         nameF =strcat(nameF, '_iter', num2str(i), '.mat');
         if (exist(fullfile(SAVEPATH,  nameF), 'file'))
             load(fullfile(SAVEPATH,  nameF));
         else
-            lambda0_currLst = [.0001 .001 .005 .05  0.1]; %.1  .05
+            lambda0_currLst = [.02 .05 .1 .5]; %.1  .05 0.1
             inputOpt.errorPre = clustersErr;
             inputOpt.itt = i;
             inputOpt.GrndTrth = options.GrndTrth;
@@ -50,13 +50,13 @@ for normType = [2]
             for lambda0 = lambda0_currLst
                 lambda1_currLst = [ lambda0*.0001 ];%, lambda0*.02]; lambda0*.01
                 if i >1
-                    lambda1_currLst = [ lambda0*.0001 lambda0*.001 lambda0*.01 lambda0*.1];%, lambda0*.02]; lambda0*.01
+                    lambda1_currLst = [ lambda0*.0001 lambda0*.001 lambda0*.01 ];%, lambda0*.02]; lambda0*.01
                 end
                 
                 for lambda1 = lambda1_currLst
                     [cZ, cZKSym, cclusters, cclustersErr,CMissrate, cinputOpt] =  mainProcess...
                         (Y, numClass, preQ, preZ, lambda0,lambda1, clusterPre, inputOpt, rho, alpha, normType);
-                    if CMissrate < missrate(i)
+                    if CMissrate <= missrate(i)
                         Z=cZ;
                         ZKSym= cZKSym;
                         clusters = cclusters;
@@ -77,17 +77,18 @@ for normType = [2]
             end
             isNanMat(i) = sum(isnan(clustersErr))/N;
             QMat        = findQ_prob(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha, inputOpt);
-%             if sum(isnan(QMat(:)))
-%                 yiui=1;
-%             end
-            %             QMat        = findQ(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha);
-%             QMat = findQ_infinityNorm(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha);
-            [sPath] = plotFigure (QMat,ZKSym, missrate(i), options, 11, clustersErr, 0);
+            %             if sum(isnan(QMat(:)))
+            %                 yiui=1;
+            %             end
+%             QMat        = findQ(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha);
+            %             QMat = findQ_infinityNorm(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha);
             if ( ~isdir(SAVEPATH))
                 mkdir(SAVEPATH);
             end
-            save(fullfile(SAVEPATH,  nameF), 'Z', 'ZKSym','missrate','isNanMat', 'QMat', 'thrshPrc' );
+            save(fullfile(SAVEPATH,  nameF), 'Z', 'ZKSym','missrate','isNanMat', 'QMat', 'thrshPrc','lambda0Lst', 'lambda1Lst');
         end
+        [sPath] = plotFigure (QMat,ZKSym, missrate(i), options, 11, clustersErr, 0);
+
         if (i>2 && isNanMat(i) >= isNanMat(i-1))
             break;
         end
@@ -105,7 +106,7 @@ for normType = [2]
         nameF =strcat(nameF, 'sample', num2str(options.sample));
     end
     nameF =strcat(nameF, '.mat');
-
+    
     
     
     save(fullfile(SAVEPATH,  nameF), 'Z', 'ZKSym','lambda0Lst', 'lambda1Lst', 'thrshPrc', 'missrate', 'QMatLst' );

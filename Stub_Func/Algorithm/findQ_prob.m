@@ -11,7 +11,7 @@ for i=1:N,
     end
 end
 %% threshold
-QMatThsh = updateQ(ZKSym, clusters, N, inputOpt);
+QMatThsh = updateQ2(ZKSym, clusters, N, inputOpt);
 
 QMat = QMatThsh+QMatCls;%(QMatThsh|QMatCls)*(1+eps);%(QMatThsh|QMatCls)*(1+eps);%
 end
