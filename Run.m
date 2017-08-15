@@ -21,21 +21,23 @@ opt.noise = .3;
 
 %%
 
-for errorPrc = 90/100: -10/100:90/100;
+for errorPrc = 80/100: 10/100:80/100
     opt.noise =errorPrc;
-    for sample = 1:1
-        opt.sample = sample;
+    for sample = 1:10
+        opt.sample = 1;
         [Y, opt.GrndTrth , opt.savePath] = ReadData (DataType, opt);
         k = max(opt.GrndTrth);
         opt.SSCrho = 1;
         opt.k = k;
+        opt.sample = sample;
         
-%         nameF =strcat('normType', num2str(2), 'N', num2str(size(Y,2)));
-%         nameF =strcat(nameF, 'sample', num2str(sample));
-%         nameF =strcat(nameF, '.mat');
-%         load (fullfile(opt.savePath,  nameF));
-%         if (missrate(end)>.05)
-            Prob_itterative_SSC(Y, opt.GrndTrth  ,opt);
-%         end
+        
+        %         nameF =strcat('normType', num2str(2), 'N', num2str(size(Y,2)));
+        %         nameF =strcat(nameF, 'sample', num2str(sample));
+        %         nameF =strcat(nameF, '.mat');
+        %         load (fullfile(opt.savePath,  nameF));
+        %         if (missrate(end)>.05)
+        Prob_itterative_SSC(Y, opt.GrndTrth  ,opt);
+        %         end
     end
 end

@@ -30,7 +30,7 @@ for normType = [2]
     
     %% iterative step
     SAVEPATH=strcat(pwd,filesep,options.savePath);
-    for i=1:10
+    for i=1:1
         nameF =strcat('Iter_normType', num2str(normType),'N', num2str(N) );
         if (isfield(options,'sample'))
             nameF =strcat(nameF, 'sample', num2str(options.sample));
@@ -39,7 +39,7 @@ for normType = [2]
         if (exist(fullfile(SAVEPATH,  nameF), 'file'))
             load(fullfile(SAVEPATH,  nameF));
         else
-            lambda0_currLst = [.02 .05 .1 ]; %.1  .05 0.1
+            lambda0_currLst = [.02 .05 .1 .5]; %.1  .05 0.1
             inputOpt.errorPre = clustersErr;
             inputOpt.itt = i;
             inputOpt.GrndTrth = options.GrndTrth;
@@ -74,6 +74,9 @@ for normType = [2]
                         missrate(i) = CMissrate;
                     end
                 end
+            end
+            if missrate(i)>=.043
+                r =9;
             end
             isNanMat(i) = sum(isnan(clustersErr))/N;
             QMat        = findQ_prob(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha, inputOpt);
