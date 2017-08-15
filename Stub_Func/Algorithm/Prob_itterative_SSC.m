@@ -80,9 +80,6 @@ for normType = [2]
             end
             isNanMat(i) = sum(isnan(clustersErr))/N;
             QMat        = findQ_prob(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha, inputOpt);
-            %             if sum(isnan(QMat(:)))
-            %                 yiui=1;
-            %             end
 %             QMat        = findQ(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha);
             %             QMat = findQ_infinityNorm(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha);
             if ( ~isdir(SAVEPATH))

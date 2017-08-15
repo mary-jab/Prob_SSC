@@ -18,7 +18,7 @@ i = 1;
 minMis = 1;
 % if isfield(options, 'sortedArr')==0 
 % end
-for prc = [.90:-.05:.05]   
+for prc = .9:-.05:.05   
     options.sortedArr = sort(errRatio);
     options.BaseTheshold  = options.sortedArr(uint16(prc*N));
     theshold =options.BaseTheshold/(options.itt);%sortedArr(uint16((.9-(options.itt-1)*.1)*N));% *maxCluster);

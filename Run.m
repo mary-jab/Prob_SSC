@@ -21,15 +21,15 @@ opt.noise = .3;
 
 %%
 
-for errorPrc = 80/100: 10/100:80/100
+for errorPrc = 60/100: 10/100:80/100
     opt.noise =errorPrc;
     for sample = 1:10
-        opt.sample = 1;
+        %         opt.sample = 1;
+        opt.sample = sample;
         [Y, opt.GrndTrth , opt.savePath] = ReadData (DataType, opt);
         k = max(opt.GrndTrth);
         opt.SSCrho = 1;
         opt.k = k;
-        opt.sample = sample;
         
         
         %         nameF =strcat('normType', num2str(2), 'N', num2str(size(Y,2)));
