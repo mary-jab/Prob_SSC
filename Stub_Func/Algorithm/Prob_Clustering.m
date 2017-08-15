@@ -18,7 +18,7 @@ i = 1;
 minMis = 1;
 % if isfield(options, 'sortedArr')==0 
 % end
-for prc = [.95:-.05:.05]   
+for prc = [.90:-.05:.05]   
     options.sortedArr = sort(errRatio);
     options.BaseTheshold  = options.sortedArr(uint16(prc*N));
     theshold =options.BaseTheshold/(options.itt);%sortedArr(uint16((.9-(options.itt-1)*.1)*N));% *maxCluster);
@@ -29,7 +29,7 @@ for prc = [.95:-.05:.05]
     clustersErr= clusters ;
     clustersErr( isnan(options.errorPre) & diffIdx2) = NaN;
     % if (options.itt<5)
-    clustersErr(diffIdx1) = NaN;
+%     clustersErr(diffIdx1) = NaN;
     
     id = ~isnan(clustersErr);
     missrate(i) = Misclassification(clustersErr(id), options.GrndTrth(id)); % it is an approximate way to calculate ACC.

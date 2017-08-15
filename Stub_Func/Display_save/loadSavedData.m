@@ -1,11 +1,11 @@
 
-noise = .2;
+noise = .1;
 
 loadPath = strcat(pwd,'\savedRes\GuassianNois_Cls_15\Subspace_noise_', num2str(noise), '\ambiant100');
 normType = 2;
 N = 300;
 misArr = zeros(20,10);
-for sample = 1:10
+for sample = 1:5
     nameF =strcat('normType', num2str(normType), 'N', num2str(N));
         nameF =strcat(nameF, 'sample', num2str(sample));
     nameF =strcat(nameF, '.mat');
@@ -18,6 +18,6 @@ mean(misEnd)
 
 figure, hold on 
 c = 'rgbmkcrgbmkcrgbmkc';
-for sample = 1:10
+for sample = 1:5
     plot (misArr(sample, :), 'color', c(sample) )
 end
