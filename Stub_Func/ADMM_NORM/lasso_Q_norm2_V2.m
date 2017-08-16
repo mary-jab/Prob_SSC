@@ -61,7 +61,7 @@ end
 
 % setting penalty parameters for the ADMM
 mu1  = alpha1*1/computeLambda_mat(Y);%1/alpha1 * lmbd0;%lmbd0;%
-mu11 = alpha1* 1/computeLambda_mat(Y)* lmbd1/lmbd0;%1/alpha1 * lmbd1;lmbd1;%
+mu11 =  mu1*lmbd1;%1/alpha1 * lmbd1;lmbd1;%
 mu2 = alpha2 * 1;
 
 ouliers = 1;

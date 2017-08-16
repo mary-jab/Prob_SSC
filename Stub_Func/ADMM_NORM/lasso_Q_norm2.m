@@ -27,17 +27,18 @@ end
 
 b = A;
 % save a matriC-vector multiply
-Atb = A'*b;
 
 % ADMM solver
-
-
-
 if ~QUIET
     fprintf('%3s\t%10s\t%10s\t%10s\t%10s\t%10s\n', 'iter', ...
         'r norm', 'eps pri', 's norm', 'eps dual', 'objective');
 end
+
+oulier = 1;
+
 if (~oulier)
+    Atb = A'*b;
+    
     C = zeros(N,N);
     z = preZ;%(:,id);%zeros(n,1);
     u = zeros(N,N);
@@ -57,7 +58,7 @@ if (~oulier)
         
         % z-update with relaCation
         zold = z;
-        C_hat = alpha*C + (1 - alpha)*zold;
+        %         C_hat = alpha*C + (1 - alpha)*zold;
         z = shrinkage(C_hat + u, (lambda0*ones(N,N)) /rho );% + lambda1*(1-Q)) /rho );
         z = z - diag(diag(z));
         
@@ -87,58 +88,35 @@ if (~oulier)
     end
 else
     
-    gamma = alpha / norm(Y,1);
-    P = [Y eye(D)/gamma];
+    gamma = alpha / norm(A,1);
+    P = [A eye(D)/gamma];
     Qext = [Q eye(N,D)/gamma ];
-    
+    Atb = P'*b;
     
     C = zeros(N,N);
     z = [preZ; zeros(D, N)];%(:,id);%zeros(n,1);
-    u = zeros(N,N);
+    u = zeros(N+D,N);
     oulier = 0;
     % cache the factorization  A == L*U
     [L, U] =  factor(P,Qext, lambda1, rho);
-    
-    
-        C1 =
-    Lambda1 = zeros(D,N);
-    Lambda2 = zeros(N+D,N);
-    err1 = 10*thr1; err2 = 10*thr2;
-    
-    
-    
-    
-    A = inv(mu1*(P'*P)+mu2*eye(N+D));
-    %C1 = zeros(N+D,N);
-    C1 =[Z; zeros(D, N)];
-    Lambda1 = zeros(D,N);
-    Lambda2 = zeros(N+D,N);
-    err1 = 10*thr1; err2 = 10*thr2;
-    k = 1;
-    % ADMM iterations
-    for k = 1:MAC_ITER
-        % updating Z
-        Z = A * (mu1*P'*(Y+Lambda1/mu1)+mu2*(C1-Lambda2/mu2));
-        Z(1:N,:) = Z(1:N,:) - diag(diag(Z(1:N,:)));
-        % updating C
-        %C2                      = max(0,(abs(Z                     +Lambda2          /mu2) - 1/mu2* ones(N+D,N)))                                              .* sign(Z           +Lambda2         /mu2);
-        C2(N+1:N+D,:)  = max(0,(abs(Z(N+1:N+D,:)+Lambda2(N+1:N+D,:) /mu2) - 1/mu2* ones(D,     N)))                                                   .* sign(Z(N+1:N+D,:)+Lambda2(N+1:N+D,:) /mu2);
-        %C2(1:N,:)            = max(0,(abs(Z(1:N,:)          +Lambda2(1:N,:)            /mu2) - 1/mu2*(ones(N,     N) + nu*gamma0 *(1-Theta)))) .* sign(Z(1:N,:)          +Lambda2(1:N,:)           /mu2);
-        C2(1:N,:)           = max(0,(abs(Z(1:N,:)          +Lambda2(1:N,:)            /mu2) - 1/mu2*(ones(N,      N)./nu+ nu*gamma0 *(1-Theta)))) .* sign(Z(1:N,:)+Lambda2(1:N,:)/mu2);
-        C2(1:N,:) = C2(1:N,:) - diag(diag(C2(1:N,:)));
-        % updating Lagrange multipliers
-        Lambda1 = Lambda1 + mu1 * (Y - P * Z);
-        Lambda2 = Lambda2 + mu2 * (Z - C2);
-        C1 = C2;
-        % computing errors
-        err1(k+1) = errorCoef(Z,C2);
-        err2(k+1) = errorLinSys(P,Z);
-        %
-        history.objval(k)  = objective(A, b, Q, lambda0, lambda1, C, z);%objective(A, b, lambda0, C, z);
         
+    for k = 1:MAC_ITER
+        % C-update
+        q = Atb + rho*z - u;
+        C = U \ (L \ q);
+        C(1:N,:)  = C(1:N,:) - diag(diag(C(1:N,:)));
+        C_hat = C;
+        zold = z;
+        %         C_hat = alpha*C + (1 - alpha)*zold;
+        z = shrinkage(C_hat + u, (lambda0*ones(N+D,N)) /rho );% + lambda1*(1-Q)) /rho );
+        z(1:N,:) = z(1:N,:) - diag(diag(z(1:N,:)));
+        % u-update
+        u = u + (C_hat - z);
+        
+        history.objval(k)  = objective(P, b, Qext, lambda0, lambda1, C, z);%objective(A, b, lambda0, C, z);
         history.r_norm(k)  = norm(C - z);
         history.s_norm(k)  = norm(-rho*(z - zold));
-        
+       
         history.eps_pri(k) = sqrt(N)*ABSTOL + RELTOL*max(norm(C), norm(-z));
         history.eps_dual(k)= sqrt(N)*ABSTOL + RELTOL*norm(rho*u);
         
@@ -148,17 +126,17 @@ else
                 history.s_norm(k), history.eps_dual(k), history.objval(k));
         end
         
-        
-        
-        if (err1(k) < thr1 || err2(k) < thr2)
+        if (history.r_norm(k) < history.eps_pri(k) && ...
+                history.s_norm(k) < history.eps_dual(k))
             break;
         end
+        
     end
     
 end
 
 
-Z= z;
+Z= z(1:N,:);
 % end
 
 if ~QUIET
