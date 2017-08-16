@@ -10,14 +10,18 @@ clustersErr = nan(N,1);
 
 errorProb = [];
 %% save 1st Step
-iter =1;
-inputOpt.iter = iter;
-inputOpt.errorPre=clustersErr;
-inputOpt.s = s;
-
+% iter =1;
+% inputOpt.iter = iter;
+options.errorPre=clustersErr;
+% inputOpt.s = s;
+if isfield(options, 'normType')
+    normLst = options.normType;
+else
+    normLst = 2;
+end
 %% Algorithm
 %% first Step
-for normType = [2]
+for normType = normLst
     rho = 1.0;
     alpha=1.0;
     lambda0 = .05;%.05;%.05;
@@ -30,7 +34,7 @@ for normType = [2]
     
     %% iterative step
     SAVEPATH=strcat(pwd,filesep,options.savePath);
-    for i=1:1
+    for i=1:10
         nameF =strcat('Iter_normType', num2str(normType),'N', num2str(N) );
         if (isfield(options,'sample'))
             nameF =strcat(nameF, 'sample', num2str(options.sample));
@@ -39,10 +43,10 @@ for normType = [2]
         if (exist(fullfile(SAVEPATH,  nameF), 'file'))
             load(fullfile(SAVEPATH,  nameF));
         else
-            lambda0_currLst = [.02 .05 .1 .5]; %.1  .05 0.1
-            inputOpt.errorPre = clustersErr;
-            inputOpt.itt = i;
-            inputOpt.GrndTrth = options.GrndTrth;
+            lambda0_currLst = [.002 .02 .05 .1 .2 .5 ]; %.1  .05 0.1
+            options.errorPre = clustersErr;
+            options.itt = i;
+%             inputOpt.GrndTrth = options.GrndTrth;
             missrate(i) = 1;
             lambda0Lst{i}=[];
             lambda1Lst{i}=[];
@@ -55,7 +59,7 @@ for normType = [2]
                 
                 for lambda1 = lambda1_currLst
                     [cZ, cZKSym, cclusters, cclustersErr,CMissrate, cinputOpt] =  mainProcess...
-                        (Y, numClass, preQ, preZ, lambda0,lambda1, clusterPre, inputOpt, rho, alpha, normType);
+                        (Y, numClass, preQ, preZ, lambda0,lambda1, clusterPre, options, rho, alpha, normType);
                     if CMissrate <= missrate(i)
                         Z=cZ;
                         ZKSym= cZKSym;

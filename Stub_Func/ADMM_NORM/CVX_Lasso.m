@@ -79,69 +79,93 @@
 % end
 
 %% vectorized
-% function [ZZ] = CVX_Lasso(Y, QMat,cst, lambda0, lambda1)
-% tic
-% N = (size(Y,2));
-% cvx_begin quiet;
-% %cvx_precision high
-% variable ZZ(N,N);
-% expression X(N)
-% for i = 1: N,
-%     X(i)=(norm (Y * ZZ(:,i)  - Y(:,i),2)) + lambda0* norm(ZZ(:,i),1)+...
-%         lambda1*( norm((1-QMat(:,i)).* ZZ(:,i),2)   ) ;
-% end
-% minimize(sum(X))
-% subject to
-% diag(ZZ) == 0;
-% cvx_end;
-% toc
-% end
-
 function [ZZ] = CVX_Lasso(Y, QMat,cst, lambda0, lambda1)
-tic
-
+Opt =  'L1Noisy';
+tic   
 N = (size(Y,2));
-diagIDX = 1:(N+1):N*N;
 
-% Now vectorize everything
-I = speye(N);
-J = kron(I,Y);
-y = Y(:); 
-
-cvx_begin quiet;
-%cvx_precision high
-variable ZZ(N*N);
-expressions X 
-% for i = 1: N,
-    X=(norm (J * ZZ  - y,2)) + lambda0* norm(ZZ,1);%+...
-%         lambda1*( norm((1-QMat(:,i)).* ZZ(:,i),2)   ) ;
-% end
-minimize(X)
-subject to
-ZZ(diagIDX)==0;
-cvx_end;
-
-ZZ = reshape(ZZ,[N,N]);
-ZZ(abs(ZZ)<.0001)=0;
-toc
+if ( strcmp(Opt , 'Lasso') )
+    cvx_begin quiet;
+    %cvx_precision high
+    variable ZZ(N,N);
+    expression X(N)
+    for i = 1: N,
+        X(i)=(norm (Y * ZZ(:,i)  - Y(:,i),2)) + lambda0* norm(ZZ(:,i),1)+...
+            lambda1*( norm((1-QMat(:,i)).* ZZ(:,i),2)   ) ;
+    end
+    minimize(sum(X))
+    subject to
+    diag(ZZ) == 0;
+    cvx_end;
+    
+elseif ( strcmp(Opt , 'L1Noisy') )
+    cvx_begin;
+    cvx_precision high
+    expression X(N)
+    variable ZZ(N,N);
+    for i = 1: N,
+        X(i)=lambda0* norm(ZZ(:,i),1)+...
+            lambda1*( norm((1-QMat(:,i)).* ZZ(:,i),2)   ) ;
+    end
+    minimize(sum(X))
+    subject to
+    norm (Y * ZZ  - Y,2) <= lambda0+lambda1;
+    diag(ZZ) == 0;
+    cvx_end;
+    
 end
 
 
-% 
+
+
+toc
+end
+
+% function [ZZ] = CVX_Lasso(Y, QMat,cst, lambda0, lambda1)
+% tic
+%
+% N = (size(Y,2));
+% diagIDX = 1:(N+1):N*N;
+%
+% % Now vectorize everything
+% I = speye(N);
+% J = kron(I,Y);
+% y = Y(:);
+%
+% cvx_begin quiet;
+% %cvx_precision high
+% variable ZZ(N*N);
+% expressions X
+% % for i = 1: N,
+%     X=(norm (J * ZZ  - y,2)) + lambda0* norm(ZZ,1);%+...
+% %         lambda1*( norm((1-QMat(:,i)).* ZZ(:,i),2)   ) ;
+% % end
+% minimize(X)
+% subject to
+% ZZ(diagIDX)==0;
+% cvx_end;
+%
+% ZZ = reshape(ZZ,[N,N]);
+% ZZ(abs(ZZ)<.0001)=0;
+% toc
+% end
+
+
+%
 % function [ZZ] = CVX_Lasso(Y, QMat,cst, lambda0, lambda1)
 % tic
 % N = (size(Y,2));
 % cvx_begin quiet;
 % %cvx_precision high
 % variables ZZ(N,N) Err zz aa;
-% 
+%
 % minimize(Err + lambda0 * zz + lambda1*aa)
 % subject to
 % norm(Y*ZZ - Y, 2) <= Err;
 % norm(ZZ, 1) <= zz;
 % norm((1-QMat).* ZZ, 'fro') <=aa
 % diag(ZZ) == 0;
-% 
+%
 % cvx_end;
 % toc
 % end
