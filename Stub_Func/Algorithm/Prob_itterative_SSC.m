@@ -43,7 +43,7 @@ for normType = normLst
         if (exist(fullfile(SAVEPATH,  nameF), 'file'))
             load(fullfile(SAVEPATH,  nameF));
         else
-            lambda0_currLst = [.002 .02 .05 .1 .2 .5 ]; %.1  .05 0.1
+            lambda0_currLst = 1%[0.0002 0.002  ]%.05 .1 ]; %.1  .05 0.1
             options.errorPre = clustersErr;
             options.itt = i;
 %             inputOpt.GrndTrth = options.GrndTrth;
@@ -54,7 +54,7 @@ for normType = normLst
             for lambda0 = lambda0_currLst
                 lambda1_currLst = [ lambda0*.0001 ];%, lambda0*.02]; lambda0*.01
                 if i >1
-                    lambda1_currLst = [ lambda0*.0001 lambda0*.001 lambda0*.01 ];%, lambda0*.02]; lambda0*.01
+                    lambda1_currLst = [ lambda0*.001  lambda0*.01 lambda0*1 lambda0*10 lambda0*100];%, lambda0*.02]; lambda0*.01 lambda0*.0001 lambda0*.001
                 end
                 
                 for lambda1 = lambda1_currLst

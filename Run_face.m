@@ -29,7 +29,7 @@ gamma0 =0.3;
 
 
 nSet = [2 3 5 8 10];
-for i = 4:length(nSet)
+for i = 1:length(nSet)
     k = nSet(i);
     idx = Ind{k};
     opt.savePath = ['savedRes/YaleBCrop025/Class_' num2str(k) '/'] ;

@@ -60,8 +60,8 @@ elseif (length(thr) == 2)
 end
 
 % setting penalty parameters for the ADMM
-mu1 = 1/computeLambda_mat(Y);%1/alpha1 * lmbd0;%
-mu11 = 1/computeLambda_mat(Y)* lmbd1/lmbd0;%1/alpha1 * lmbd1;
+mu1  = alpha1*1/computeLambda_mat(Y);%1/alpha1 * lmbd0;%lmbd0;%
+mu11 = alpha1* 1/computeLambda_mat(Y)* lmbd1/lmbd0;%1/alpha1 * lmbd1;lmbd1;%
 mu2 = alpha2 * 1;
 
 ouliers = 1;
@@ -154,4 +154,18 @@ end
 M = repmat(n,size(Y,1),1);
 S = Yn - Y * C ./ M;
 err = sqrt( max( sum( S.^2,1 ) ) );
+end
+
+
+function lambda = computeLambda_mat(Y,P)
+
+if (nargin < 2)
+    P = Y;
+end
+
+N = size(Y,2);
+T = P' * Y;
+T(1:N,:) = T(1:N,:) - diag(diag(T(1:N,:)));
+T = abs(T);
+lambda = min(max(T,[],1));
 end
