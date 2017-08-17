@@ -1,4 +1,4 @@
-function [Z, history] = lasso_Q_nom2(A, Q, lambda0 , lambda1, rho, alpha, preZ)
+function [Z, history] = lasso_Q_nom2(A, Q, lambda0 , lambda1, rho, alpha, preZ, options)
 % lasso  Solve lasso problem via ADMM
 %
 % [z, history] = lasso(A, b, lambda, rho, alpha);
@@ -12,8 +12,8 @@ function [Z, history] = lasso_Q_nom2(A, Q, lambda0 , lambda1, rho, alpha, preZ)
 t_start = tic;
 % Global constants and defaults
 
-QUIET    = 0;
-MAC_ITER = 500;
+QUIET    = 1;
+MAC_ITER = 200;
 ABSTOL   = 1e-6;
 RELTOL   = 1e-4;
 
@@ -34,9 +34,8 @@ if ~QUIET
         'r norm', 'eps pri', 's norm', 'eps dual', 'objective');
 end
 
-oulier = 1;
 
-if (~oulier)
+if (~options.ouliers)
     Atb = A'*b;
     
     C = zeros(N,N);
@@ -55,10 +54,13 @@ if (~oulier)
         %             C = q/rho - (A'*(U \ ( L \ (A*q) )))/rho^2;
         %         end
         C = C - diag(diag(C));
+        C_hat = C;
         
+        if (options.affine)
+            C_hat = alpha*C + (1 - alpha)*z;
+        end
         % z-update with relaCation
         zold = z;
-        %         C_hat = alpha*C + (1 - alpha)*zold;
         z = shrinkage(C_hat + u, (lambda0*ones(N,N)) /rho );% + lambda1*(1-Q)) /rho );
         z = z - diag(diag(z));
         
@@ -87,7 +89,6 @@ if (~oulier)
         
     end
 else
-    
     gamma = alpha / norm(A,1);
     P = [A eye(D)/gamma];
     Qext = [Q eye(N,D)/gamma ];
@@ -99,15 +100,18 @@ else
     oulier = 0;
     % cache the factorization  A == L*U
     [L, U] =  factor(P,Qext, lambda1, rho);
-        
+    
     for k = 1:MAC_ITER
         % C-update
         q = Atb + rho*z - u;
         C = U \ (L \ q);
         C(1:N,:)  = C(1:N,:) - diag(diag(C(1:N,:)));
         C_hat = C;
+        if (options.affine)
+            C_hat = alpha*C + (1 - alpha)*z;
+        end
+        % z-update with relaCation
         zold = z;
-        %         C_hat = alpha*C + (1 - alpha)*zold;
         z = shrinkage(C_hat + u, (lambda0*ones(N+D,N)) /rho );% + lambda1*(1-Q)) /rho );
         z(1:N,:) = z(1:N,:) - diag(diag(z(1:N,:)));
         % u-update
@@ -116,7 +120,7 @@ else
         history.objval(k)  = objective(P, b, Qext, lambda0, lambda1, C, z);%objective(A, b, lambda0, C, z);
         history.r_norm(k)  = norm(C - z);
         history.s_norm(k)  = norm(-rho*(z - zold));
-       
+        
         history.eps_pri(k) = sqrt(N)*ABSTOL + RELTOL*max(norm(C), norm(-z));
         history.eps_dual(k)= sqrt(N)*ABSTOL + RELTOL*norm(rho*u);
         
@@ -138,6 +142,7 @@ end
 
 Z= z(1:N,:);
 % end
+    fprintf('err1: %2.4f, err2: %2.4f, iter: %3.0f \n',history.r_norm(end),history.s_norm(end),k);
 
 if ~QUIET
     toc(t_start);

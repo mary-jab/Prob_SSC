@@ -11,19 +11,22 @@ opt.dim = 5;
 opt.amb = 100;
 opt.noise = .3;
 %% Intersection
-% DataType{1} = 'syn';
-% DataType{2} = 'intersect';
-% opt.clas = 3;
-% opt.dim = 10;
-% opt.amb = 200;
+DataType{2} = 'intersect';
+opt.clas = 2;
+opt.dim = 10;
+opt.amb = 200;
+opt.ouliers = 0;
+opt.affine = 0;
+
+
 %% handwritten
 % DataType{1} = 'handwritten';
 
 %%
 
-for errorPrc = 00/100: 10/100:60/100
+for errorPrc = 50/100: 10/100:60/100
     opt.noise =errorPrc;
-    for sample = 1:20
+    for sample = [  11       13        18    ]%1:20
         opt.sample = sample;
         [Y, opt.GrndTrth , opt.savePath] = ReadData (DataType, opt);
         k = max(opt.GrndTrth);

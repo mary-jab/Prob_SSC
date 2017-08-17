@@ -26,6 +26,7 @@ results_fn =['StrSSC_Faces_tuned_gamma0_results',datestr(now,30),'.mat'];
 alpha = 20;
 gamma0 =0.3;
 
+opt.oulier = 1;
 
 
 nSet = [2 3 5 8 10];
@@ -33,7 +34,7 @@ for i = 1:length(nSet)
     k = nSet(i);
     idx = Ind{k};
     opt.savePath = ['savedRes/YaleBCrop025/Class_' num2str(k) '/'] ;
-    for j = 3:size(idx,1)
+    for j = 24:size(idx,1)
         opt.sample = j;
         X = [];
         for p = 1:k

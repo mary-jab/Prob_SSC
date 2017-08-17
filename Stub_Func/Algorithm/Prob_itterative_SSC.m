@@ -21,7 +21,7 @@ else
 end
 %% Algorithm
 %% first Step
-for normType = normLst
+for normType = 2%normLst
     rho = 1.0;
     alpha=1.0;
     lambda0 = .05;%.05;%.05;
@@ -43,19 +43,19 @@ for normType = normLst
         if (exist(fullfile(SAVEPATH,  nameF), 'file'))
             load(fullfile(SAVEPATH,  nameF));
         else
-            lambda0_currLst =[0.002 0.02  05 .1 .5]%. ]; %.1  .05 0.1
+            lambda0_currLst =[.002 .02  .05 .1 .5];%. ]; %.1  .05 0.1 %1;%[10 30 100 500 800 1000];%
             options.errorPre = clustersErr;
             options.itt = i;
-%             inputOpt.GrndTrth = options.GrndTrth;
+            %             inputOpt.GrndTrth = options.GrndTrth;
             missrate(i) = 1;
             lambda0Lst{i}=[];
             lambda1Lst{i}=[];
             thrshPrc{i}=[];
             for lambda0 = lambda0_currLst
-                lambda1_currLst = [ lambda0*.0001 ];%, lambda0*.02]; lambda0*.01
+                lambda1_currLst = [ lambda0*.0001 ];%, lambda0*.02]; lambda0*.01    30;%
                 if i >1
-                    lambda1_currLst = [ lambda0*.001  lambda0*.01 lambda0*1 lambda0*10 lambda0*100];%, lambda0*.02]; lambda0*.01 lambda0*.0001 lambda0*.001
-                end
+                    lambda1_currLst = [ lambda0*.0001 lambda0*.001  lambda0*.01 lambda0*.1 lambda0*1 lambda0*10];%  lambda0*100];%, lambda0*.02]; lambda0*.01 lambda0*.0001 lambda0*.001
+                end %[.001 .01 .1 .6 .9]%[ 1 10 30 80 200 800] ;%
                 
                 for lambda1 = lambda1_currLst
                     [cZ, cZKSym, cclusters, cclustersErr,CMissrate, cinputOpt] =  mainProcess...
@@ -67,9 +67,9 @@ for normType = normLst
                         clustersErr = cclustersErr;
                         inputOpt=cinputOpt;
                         if (CMissrate < missrate(i) && ~isempty(lambda0Lst{i}))
-                            lambda0Lst{i}(end) = lambda0;
-                            lambda1Lst{i}(end) = lambda1;
-                            thrshPrc{i}(end) = inputOpt.thresholdPRC;
+                            lambda0Lst{i} = lambda0;
+                            lambda1Lst{i} = lambda1;
+                            thrshPrc{i} = inputOpt.thresholdPRC;
                         else
                             lambda0Lst{i}(end+1) = lambda0;
                             lambda1Lst{i}(end+1) = lambda1;
@@ -83,16 +83,16 @@ for normType = normLst
                 r =9;
             end
             isNanMat(i) = sum(isnan(clustersErr))/N;
-            QMat        = findQ_prob(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha, inputOpt);
-%             QMat        = findQ(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha);
+            %             QMat        = findQ_prob(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha, inputOpt);
+            QMat        = findQ(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha);
             %             QMat = findQ_infinityNorm(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha);
             if ( ~isdir(SAVEPATH))
                 mkdir(SAVEPATH);
             end
             save(fullfile(SAVEPATH,  nameF), 'Z', 'ZKSym','missrate','isNanMat', 'QMat', 'thrshPrc','lambda0Lst', 'lambda1Lst');
         end
-        [sPath] = plotFigure (QMat,ZKSym, missrate(i), options, 11, clustersErr, 0);
-
+        %        [sPath] = plotFigure (QMat,ZKSym, missrate(i), options, 11, clustersErr, 0);
+        
         if (i>2 && isNanMat(i) >= isNanMat(i-1))
             break;
         end
@@ -121,7 +121,7 @@ end
 
 function [Z, ZKSym, clusters, clustersErr,missrate, inputOpt] = ...
     mainProcess(Y, numClass, preQ, preZ, lambda0,lambda1, clusterPre, inputOpt, rho, alpha, normType)
-[Z, ZKSym] = myLasso(Y, preQ, preZ, lambda0,lambda1, rho, alpha, normType);
+[Z, ZKSym] = myLasso(Y, preQ, preZ, lambda0,lambda1, rho, alpha, normType, inputOpt);
 [clusters, clustersErr, minErrProb,errorPrbMat,inputOpt] = ...
     Prob_Clustering(Y, ZKSym, numClass, clusterPre, inputOpt);
 inputOpt.errorPrbMat=errorPrbMat;

@@ -12,7 +12,7 @@
 % Copyright @ Ehsan Elhamifar, 2012
 %--------------------------------------------------------------------------
 
-function C2 = lasso_Q_norm2_V2(Y, lmbd0, lmbd1, Q, preZ, alpha,gamma0 , options, maxIter,thr)
+function C = lasso_Q_norm2_V3(Y, Q, lmbd0 , lmbd1, rho, alpha, preZ, options)
 
 [D,N] = size(Y);
 if (nargin < 4)
@@ -67,29 +67,32 @@ mu1  = alpha1*1/computeLambda_mat(Y);%1/alpha1 * lmbd0;%lmbd0;%
 mu11 =  mu1*lmbd1;%1/alpha1 * lmbd1;lmbd1;%
 mu2 = alpha2 * 1;
 
-
 if (~options.ouliers)
     % initialization
-    A = inv(mu1*(Y'*Y)+ mu11*(1-Q)*(1-Q)' +mu2*eye(N));
-    C1 = preZ;
-    Lambda2 = zeros(N,N);
+    A = inv((Y'*Y)+ 2*lmbd1*(1-Q)*(1-Q)' +rho*eye(N));
+    C = preZ;
+    u = zeros(N,N);
     err1 = 10*thr1; err2 = 10*thr2;
     i = 1;
     % ADMM iterations
     while ( err1(i) > thr1 && i < maxIter )
         % updating Z
-        Z = A * (mu1*(Y'*Y)+mu2*(C1-Lambda2/mu2));
+        Z = A * ((Y'*Y)+rho*(C-u/rho));
         Z = Z - diag(diag(Z));
         % updating C
-        C2 = max(0,(abs(Z+Lambda2/mu2) - 1/mu2*ones(N))) .* sign(Z+Lambda2/mu2);
-        C2 = C2 - diag(diag(C2));
+        if (options.affine)
+            C = alpha*C + (1 - alpha)*Z;
+        end
+        C = shrinkage(Z + u, (lmbd0*ones(N,N)) /rho );% + lambda1*(1-Q)) /rho );
+        C = C - diag(diag(C));
+
+        
         % updating Lagrange multipliers
-        Lambda2 = Lambda2 + mu2 * (Z - C2);
+        u = u + rho * (Z - C);
         % computing errors
-        err1(i+1) = errorCoef(Z,C2);
+        err1(i+1) = errorCoef(Z,C);
         err2(i+1) = errorLinSys(Y,Z);
         %
-        C1 = C2;
         i = i + 1;
     end
     fprintf('err1: %2.4f, err2: %2.4f, iter: %3.0f \n',err1(end),err2(end),i);
@@ -101,32 +104,32 @@ else
     
     A = inv(mu1*(P'*P)+ mu11*(1-Qext)'*(1-Qext) +mu2*eye(N+D));
     C1 =[preZ; zeros(D, N)];
-    Lambda1 = zeros(D,N);
-    Lambda2 = zeros(N+D,N);
+    u = zeros(D,N);
+    u = zeros(N+D,N);
     err1 = 10*thr1; err2 = 10*thr2;
     i = 1;
     % ADMM iterations
     while ( (err1(i) > thr1 || err2(i) > thr2) && i < maxIter )
         % updating Z
-        Z = A * (mu1*P'*(Y+Lambda1/mu1)+mu2*(C1-Lambda2/mu2));
+        Z = A * (mu1*P'*(Y+u/mu1)+mu2*(C1-u/mu2));
         Z(1:N,:) = Z(1:N,:) - diag(diag(Z(1:N,:)));
         % updating C
-        C2(N+1:N+D,:)  = max(0,(abs(Z(N+1:N+D,:)+Lambda2(N+1:N+D,:) /mu2) - 1/mu2*ones(D,N))) .* sign(Z(N+1:N+D,:)+Lambda2(N+1:N+D,:) /mu2);
-        C2(1:N,:)      = max(0,(abs(Z(1:N,:)    +Lambda2(1:N,:)/mu2)      - 1/mu2*ones(N,N))) .*  sign(Z(1:N,:)+Lambda2(1:N,:)/mu2);
+        C(N+1:N+D,:)  = max(0,(abs(Z(N+1:N+D,:)+u(N+1:N+D,:) /mu2) - 1/mu2*ones(D,N))) .* sign(Z(N+1:N+D,:)+u(N+1:N+D,:) /mu2);
+        C(1:N,:)      = max(0,(abs(Z(1:N,:)    +u(1:N,:)/mu2)      - 1/mu2*ones(N,N))) .*  sign(Z(1:N,:)+u(1:N,:)/mu2);
         
-        C2(1:N,:) = C2(1:N,:) - diag(diag(C2(1:N,:)));
+        C(1:N,:) = C(1:N,:) - diag(diag(C(1:N,:)));
         % updating Lagrange multipliers
-        Lambda1 = Lambda1 + mu1 * (Y - P * Z);
-        Lambda2 = Lambda2 + mu2 * (Z - C2);
+        u = u + mu1 * (Y - P * Z);
+        u = u + mu2 * (Z - C);
         % computing errors
-        err1(i+1) = errorCoef(Z,C2);
+        err1(i+1) = errorCoef(Z,C);
         err2(i+1) = errorLinSys(P,Z);
         %
-        C1 = C2;
+        C1 = C;
         i = i + 1;
     end
     fprintf('err1: %2.4f, err2: %2.4f, iter: %3.0f \n',err1(end),err2(end),i);
-    C2 =C2(1:N,:);
+    C =C(1:N,:);
 end
 end
 
@@ -158,5 +161,7 @@ M = repmat(n,size(Y,1),1);
 S = Yn - Y * C ./ M;
 err = sqrt( max( sum( S.^2,1 ) ) );
 end
-
+function z = shrinkage(C, kappa)
+z = max( 0, C - kappa ) - max( 0, -C - kappa );
+end
 

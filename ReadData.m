@@ -13,14 +13,14 @@ if (strcmp(input{1}, 'syn') && strcmp(input{2}, 'GuassianNoise'))
 elseif (strcmp(input{1}, 'syn') && strcmp(input{2}, 'intersect'))
     inputPath = ['../Generate_SyntheticData/genData/Intersect'  num2str(opt.clas) 'Cls/'];
     fileName =  [inputPath 'Subspace_intersects_sDim_' num2str(opt.dim) '_subspace' num2str(opt.clas)...
-        '_ambiant' num2str(opt.amb) '_prc' num2str(opt.noise) '_iter' num2str(opt.samNum) '.mat'];
+        '_ambiant' num2str(opt.amb) '_prc' num2str(opt.noise) '_iter' num2str(opt.sample) '.mat'];
     load (fileName);
     Y = YMat;
     s = groundTruth;
     [n, N1, numGrps] = size(Y);
     N= N1*numGrps;
     %     Y = reshape(( Y(:,:,1:numGrps)),n, N);
-    savePath = ['savedRes/Intersect'  num2str(opt.clas) 'Cls/Subspace_noise_' num2str(opt.noise) '/ambiant' num2str(opt.amb) '/'];
+    savePath = ['savedRes/Intersect/cls'  num2str(opt.clas) '/Subspace_noise_' num2str(opt.noise) '/ambiant' num2str(opt.amb) '/'];
     
     
 elseif (strcmp(input{1}, 'handwritten'))
