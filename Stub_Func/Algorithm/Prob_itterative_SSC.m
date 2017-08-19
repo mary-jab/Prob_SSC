@@ -54,7 +54,7 @@ for normType = 2%normLst
             for lambda0 = lambda0_currLst
                 lambda1_currLst = [ lambda0*.0001 ];%, lambda0*.02]; lambda0*.01    30;%
                 if i >1
-                    lambda1_currLst = [ lambda0*.0001 lambda0*.001  lambda0*.01 lambda0*.1 lambda0*1 lambda0*10];%  lambda0*100];%, lambda0*.02]; lambda0*.01 lambda0*.0001 lambda0*.001
+                    lambda1_currLst = [ lambda0*.0001 lambda0*.001  lambda0*.01 lambda0*.1];%  lambda0*100];%, lambda0*.02]; lambda0*.01 lambda0*.0001 lambda0*.001
                 end %[.001 .01 .1 .6 .9]%[ 1 10 30 80 200 800] ;%
                 
                 for lambda1 = lambda1_currLst
@@ -83,15 +83,15 @@ for normType = 2%normLst
                 r =9;
             end
             isNanMat(i) = sum(isnan(clustersErr))/N;
-            %             QMat        = findQ_prob(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha, inputOpt);
-            QMat        = findQ(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha);
+                        QMat        = findQ_prob(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha, inputOpt);
+%             QMat        = findQ(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha);
             %             QMat = findQ_infinityNorm(clustersErr, ZKSym, lambda0, lambda1,  rho, alpha);
             if ( ~isdir(SAVEPATH))
                 mkdir(SAVEPATH);
             end
             save(fullfile(SAVEPATH,  nameF), 'Z', 'ZKSym','missrate','isNanMat', 'QMat', 'thrshPrc','lambda0Lst', 'lambda1Lst');
         end
-        %        [sPath] = plotFigure (QMat,ZKSym, missrate(i), options, 11, clustersErr, 0);
+               [sPath] = plotFigure (QMat,ZKSym, missrate(i), options, 11, clustersErr, 0);
         
         if (i>2 && isNanMat(i) >= isNanMat(i-1))
             break;

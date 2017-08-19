@@ -104,14 +104,14 @@ else
     
     A = inv(mu1*(P'*P)+ mu11*(1-Qext)'*(1-Qext) +mu2*eye(N+D));
     C1 =[preZ; zeros(D, N)];
-    u = zeros(D,N);
+    u1 = zeros(D,N);
     u = zeros(N+D,N);
     err1 = 10*thr1; err2 = 10*thr2;
     i = 1;
     % ADMM iterations
     while ( (err1(i) > thr1 || err2(i) > thr2) && i < maxIter )
         % updating Z
-        Z = A * (mu1*P'*(Y+u/mu1)+mu2*(C1-u/mu2));
+        Z = A * (mu1*P'*(Y+u1/mu1)+mu2*(C1-u/mu2));
         Z(1:N,:) = Z(1:N,:) - diag(diag(Z(1:N,:)));
         % updating C
         C(N+1:N+D,:)  = max(0,(abs(Z(N+1:N+D,:)+u(N+1:N+D,:) /mu2) - 1/mu2*ones(D,N))) .* sign(Z(N+1:N+D,:)+u(N+1:N+D,:) /mu2);
@@ -119,7 +119,7 @@ else
         
         C(1:N,:) = C(1:N,:) - diag(diag(C(1:N,:)));
         % updating Lagrange multipliers
-        u = u + mu1 * (Y - P * Z);
+        u1 = u1 + mu1 * (Y - P * Z);
         u = u + mu2 * (Z - C);
         % computing errors
         err1(i+1) = errorCoef(Z,C);

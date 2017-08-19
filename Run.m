@@ -23,24 +23,24 @@ opt.affine = 0;
 % DataType{1} = 'handwritten';
 
 %%
-
-for errorPrc = 50/100: 10/100:60/100
-    opt.noise =errorPrc;
-    for sample = [  11       13        18    ]%1:20
-        opt.sample = sample;
-        [Y, opt.GrndTrth , opt.savePath] = ReadData (DataType, opt);
-        k = max(opt.GrndTrth);
-        opt.SSCrho = 1;
-        opt.k = k;
-        
-        Prob_itterative_SSC(Y, opt.GrndTrth  ,opt);
-        
+for cls = 3:4
+    opt.clas = cls;
+    for errorPrc = 60/100: 10/100:90/100
+        opt.noise =errorPrc;
+        for sample =[27]%1:50
+            opt.sample = sample;
+            [Y, opt.GrndTrth , opt.savePath] = ReadData (DataType, opt);
+            k = max(opt.GrndTrth);
+            opt.SSCrho = 1;
+            opt.k = k;
+            Prob_itterative_SSC(Y, opt.GrndTrth  ,opt);
+        end
     end
 end
-        
-                %         end
-        %         nameF =strcat('normType', num2str(2), 'N', num2str(size(Y,2)));
-        %         nameF =strcat(nameF, 'sample', num2str(sample));
-        %         nameF =strcat(nameF, '.mat');
-        %         load (fullfile(opt.savePath,  nameF));
-        %         if (missrate(end)>.05)
+
+%         end
+%         nameF =strcat('normType', num2str(2), 'N', num2str(size(Y,2)));
+%         nameF =strcat(nameF, 'sample', num2str(sample));
+%         nameF =strcat(nameF, '.mat');
+%         load (fullfile(opt.savePath,  nameF));
+%         if (missrate(end)>.05)
