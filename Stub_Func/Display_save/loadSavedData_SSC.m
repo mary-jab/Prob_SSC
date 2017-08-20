@@ -1,11 +1,11 @@
 clear all, close all
 saveArr = []; cnt = 0;
-for noise = 50/100: 10/100:90/100
+for noise = 50/100: 10/100:60/100
     % loadPath = strcat(pwd,'\savedRes\GuassianNois_Cls_15\Subspace_noise_', num2str(noise), '\ambiant100');
     % N = 150;
     cnt = cnt+1;
     
-    cls = 3;
+    cls = 4;
     loadPath = strcat(pwd,'\savedRes\Intersect\cls' ,num2str(cls) ,'\Subspace_noise_', num2str(noise), '\ambiant200\SSC\');
     N = cls*100;
     % cls = 2;

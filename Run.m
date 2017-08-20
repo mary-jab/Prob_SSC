@@ -25,9 +25,9 @@ opt.affine = 0;
 %%
 for cls = 3:4
     opt.clas = cls;
-    for errorPrc = 70/100: 10/100:90/100
+    for errorPrc = 40/100: 10/100:40/100
         opt.noise =errorPrc;
-        for sample =[11 13 18 ]%1:50
+        for sample =1:50
             opt.sample = sample;
             [Y, opt.GrndTrth , opt.savePath] = ReadData (DataType, opt);
             k = max(opt.GrndTrth);

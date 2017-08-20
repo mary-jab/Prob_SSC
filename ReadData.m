@@ -8,7 +8,7 @@ if (strcmp(input{1}, 'syn') && strcmp(input{2}, 'GuassianNoise'))
     [n, N1, numGrps] = size(Y);
     N= N1*numGrps;
     Y = reshape(( Y(:,:,1:numGrps)),n, N);
-    savePath = ['savedRes/GuassianNois_Cls_' num2str(opt.clas) '/Subspace_noise_' num2str(opt.noise) '/ambiant' num2str(opt.amb) '/'];
+    savePath = ['savedRes/GuassianNois/Cls_' num2str(opt.clas) '/Subspace_noise_' num2str(opt.noise) '/ambiant' num2str(opt.amb) '/'];
     
 elseif (strcmp(input{1}, 'syn') && strcmp(input{2}, 'intersect'))
     inputPath = ['../Generate_SyntheticData/genData/Intersect'  num2str(opt.clas) 'Cls/'];
