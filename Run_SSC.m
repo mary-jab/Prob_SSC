@@ -23,29 +23,41 @@ opt.affine = 0;
 % DataType{1} = 'handwritten';
 
 %%
-list= [ 44    50    17    33    12    18    43     3    37     9    16     4    31    29    30    45    23    24     5    35;
-        35    49    18    33     9    25    46     4    37    31    44    14    12     2    11    34    45    27    22    38];
+normType = 2;
+N = opt.clas *100;
 cnt = 0;
-for cls = 4:4
+for cls = 2:2
     opt.clas = cls;
-    for errorPrc = 50/100: 10/100:60/100
-            cnt = cnt+1;
+    for errorPrc = 40/100: 10/100:60/100
+        cnt = cnt+1;
         opt.noise =errorPrc;
-        for sample =list(cnt,:)
-            opt.sample = sample;
+        
+        loadPath = strcat('savedRes\Intersect\cls' ,num2str(cls) ,'\Subspace_noise_', num2str(errorPrc), '\ambiant200');
+        for sample = 1:50
+            nameF =strcat('normType', num2str(normType), 'N', num2str(N));
+            nameF =strcat(nameF, 'sample', num2str(sample));
+            nameF =strcat(nameF, '.mat');
+            load (fullfile(loadPath,  nameF));
+            misArr(sample, :) = [missrate, ones(1, 10-length(missrate))* missrate(end)];
+            misEnd(sample) = missrate(end);
+        end
+        [a,  idx] = sort(misEnd);
+        misEnd(idx(21:end)) = [];
+        misArr((idx(21:end)),:) = [];
+        idxList(cnt, :) = idx(1:20);
+        
+       
+        for sample =idxList(cnt,18:20)
+            opt.sample  = idxList(1);
             [Y, opt.GrndTrth , opt.savePath] = ReadData (DataType, opt);
             k = max(opt.GrndTrth);
             opt.SSCrho = 1;
             opt.k = k;
-            opt.savePath = strcat(opt.savePath, '/SSC');
+                        opt.sample = sample;
+
+                        opt.savePath = strcat(opt.savePath, '/SSC');
             itterative_SSC(Y, opt.GrndTrth  ,opt);
         end
     end
 end
 
-%         end
-%         nameF =strcat('normType', num2str(2), 'N', num2str(size(Y,2)));
-%         nameF =strcat(nameF, 'sample', num2str(sample));
-%         nameF =strcat(nameF, '.mat');
-%         load (fullfile(opt.savePath,  nameF));
-%         if (missrate(end)>.05)

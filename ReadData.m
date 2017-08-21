@@ -16,7 +16,7 @@ elseif (strcmp(input{1}, 'syn') && strcmp(input{2}, 'intersect'))
         '_ambiant' num2str(opt.amb) '_prc' num2str(opt.noise) '_iter' num2str(opt.sample) '.mat'];
     load (fileName);
     Y = YMat;
-    s = groundTruth;
+    s = groundTruth;%closeCluster;%
     [n, N1, numGrps] = size(Y);
     N= N1*numGrps;
     %     Y = reshape(( Y(:,:,1:numGrps)),n, N);

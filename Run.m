@@ -23,7 +23,7 @@ opt.affine = 0;
 % DataType{1} = 'handwritten';
 
 %%
-for cls = 3:4
+for cls = 2:2
     opt.clas = cls;
     for errorPrc = 40/100: 10/100:40/100
         opt.noise =errorPrc;

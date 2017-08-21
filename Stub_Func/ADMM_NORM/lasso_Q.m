@@ -26,8 +26,8 @@ function [Z, history] = lasso_Q(A, Q, lambda0 , lambda1, rho, alpha, preZ)
 t_start = tic;
 % Global constants and defaults
 
-QUIET    = 0;
-MAC_ITER = 500;
+QUIET    = 1;
+MAC_ITER = 200;
 ABSTOL   = 1e-6;
 RELTOL   = 1e-4;
 
@@ -38,70 +38,73 @@ if nargin <7
     preZ = zeros(n,n);
 end
 % for id = 1:n
+
+b = A;%(:,id);
+% save a matriC-vector multiply
+Atb = A'*b;
+% ADMM solver
+
+C = zeros(n,n);
+z = preZ;%(:,id);%zeros(n,1);
+u = zeros(n,n);
+
+% cache the factorization
+[L U] = factor(A, rho);
+
+if ~QUIET
+    fprintf('%3s\t%10s\t%10s\t%10s\t%10s\t%10s\n', 'iter', ...
+        'r norm', 'eps pri', 's norm', 'eps dual', 'objective');
+end
+
+for k = 1:MAC_ITER
+    % C-update
+    q = Atb + rho*(z - u);    % temporary value
+    if( m >= n )    % if skinny
+        C = U \ (L \ q);
+    else            % if fat
+        C = q/rho - (A'*(U \ ( L \ (A*q) )))/rho^2;
+    end
+    C(1:n+1:n*n)  = eps;
     
-    b = A;%(:,id);
-    % save a matriC-vector multiply
-    Atb = A'*b;
-    % ADMM solver
+    % z-update with relaCation
+    zold = z;
+    C_hat = alpha*C + (1 - alpha)*zold;
+    z = shrinkage(C_hat + u, (lambda0*ones(n,n) + lambda1*(1-Q)) /rho );
     
-    C = zeros(n,n);
-    z = preZ;%(:,id);%zeros(n,1);
-    u = zeros(n,n);
+    % u-update
+    u = u + (C_hat - z);
     
-    % cache the factorization
-    [L U] = factor(A, rho);
+    % diagnostics, reporting, termination checks
+    history.objval(k)  = objective(A, b, lambda0, C, z);
+    
+    history.r_norm(k)  = norm(C - z);
+    history.s_norm(k)  = norm(-rho*(z - zold));
+    
+    history.eps_pri(k) = sqrt(n)*ABSTOL + RELTOL*max(norm(C), norm(-z));
+    history.eps_dual(k)= sqrt(n)*ABSTOL + RELTOL*norm(rho*u);
     
     if ~QUIET
-        fprintf('%3s\t%10s\t%10s\t%10s\t%10s\t%10s\n', 'iter', ...
-            'r norm', 'eps pri', 's norm', 'eps dual', 'objective');
+        fprintf('%3d\t%10.4f\t%10.4f\t%10.4f\t%10.4f\t%10.2f\n', k, ...
+            history.r_norm(k), history.eps_pri(k), ...
+            history.s_norm(k), history.eps_dual(k), history.objval(k));
     end
     
-    for k = 1:MAC_ITER
-        % C-update
-        q = Atb + rho*(z - u);    % temporary value
-        if( m >= n )    % if skinny
-            C = U \ (L \ q);
-        else            % if fat
-            C = q/rho - (A'*(U \ ( L \ (A*q) )))/rho^2;
-        end
-        C(1:n+1:n*n)  = eps;
-        
-        % z-update with relaCation
-        zold = z;
-        C_hat = alpha*C + (1 - alpha)*zold;
-        z = shrinkage(C_hat + u, (lambda0*ones(n,n) + lambda1*(1-Q)) /rho );
-        
-        % u-update
-        u = u + (C_hat - z);
-        
-        % diagnostics, reporting, termination checks
-        history.objval(k)  = objective(A, b, lambda0, C, z);
-        
-        history.r_norm(k)  = norm(C - z);
-        history.s_norm(k)  = norm(-rho*(z - zold));
-        
-        history.eps_pri(k) = sqrt(n)*ABSTOL + RELTOL*max(norm(C), norm(-z));
-        history.eps_dual(k)= sqrt(n)*ABSTOL + RELTOL*norm(rho*u);
-        
-        if ~QUIET
-            fprintf('%3d\t%10.4f\t%10.4f\t%10.4f\t%10.4f\t%10.2f\n', k, ...
-                history.r_norm(k), history.eps_pri(k), ...
-                history.s_norm(k), history.eps_dual(k), history.objval(k));
-        end
-        
-        if (history.r_norm(k) < history.eps_pri(k) && ...
-                history.s_norm(k) < history.eps_dual(k))
-            break;
-        end
-        
+    if (history.r_norm(k) < history.eps_pri(k) && ...
+            history.s_norm(k) < history.eps_dual(k))
+        break;
     end
     
-    Z= z;
+end
+
+Z= z;
 % end
 
 if ~QUIET
     toc(t_start);
 end
+fprintf('%3d\t%10.4f\t%10.4f\t%10.4f\t%10.4f\t%10.2f\n', k, ...
+    history.r_norm(k), history.eps_pri(k), ...
+    history.s_norm(k), history.eps_dual(k), history.objval(k));
 
 end
 

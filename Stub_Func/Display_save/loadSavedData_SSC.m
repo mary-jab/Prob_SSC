@@ -1,6 +1,6 @@
 clear all, close all
 saveArr = []; cnt = 0;
-for noise = 50/100: 10/100:60/100
+for noise = 40/100: 10/100:60/100
     % loadPath = strcat(pwd,'\savedRes\GuassianNois_Cls_15\Subspace_noise_', num2str(noise), '\ambiant100');
     % N = 150;
     cnt = cnt+1;
