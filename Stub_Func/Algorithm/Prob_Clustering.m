@@ -29,7 +29,7 @@ for prc = .9:-.05:.05
     clustersErr= clusters ;
     clustersErr( isnan(options.errorPre) & diffIdx2) = NaN;
     % if (options.itt<5)
-%     clustersErr(diffIdx1) = NaN;
+%      clustersErr(diffIdx1) = NaN;
     
     id = ~isnan(clustersErr);
     missrate(i) = Misclassification(clustersErr(id), options.GrndTrth(id)); % it is an approximate way to calculate ACC.

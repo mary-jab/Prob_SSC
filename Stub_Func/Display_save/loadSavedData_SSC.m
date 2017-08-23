@@ -1,12 +1,12 @@
 clear all, close all
 saveArr = []; cnt = 0;
-for noise = 40/100: 10/100:60/100
+for noise = 40/100: 10/100:90/100
     % loadPath = strcat(pwd,'\savedRes\GuassianNois_Cls_15\Subspace_noise_', num2str(noise), '\ambiant100');
     % N = 150;
     cnt = cnt+1;
     
-    cls = 4;
-    loadPath = strcat(pwd,'\savedRes\Intersect\cls' ,num2str(cls) ,'\Subspace_noise_', num2str(noise), '\ambiant200\SSC\');
+    cls = 3;
+    loadPath = strcat(pwd,'\savedRes\Intersect\cls' ,num2str(cls) ,'\Subspace_noise_', num2str(noise), '\ambiant200\S3C\');
     N = cls*100;
     % cls = 2;
     % loadPath = strcat(pwd,'\savedRes\\YaleBCrop025\Class_', num2str(cls));
@@ -27,14 +27,14 @@ for noise = 40/100: 10/100:60/100
     for sample = 1:length(dataLstName)
         nameF =dataLstName{sample};
           load (fullfile(loadPath,  nameF));
-        misArr(sample, :) = [missrate, ones(1, 10-length(missrate))* missrate(end)];
-        misEnd(sample) = missrate(end);
+%         misArr(sample, :) = [missrate, ones(1, 10-length(missrate))* missrate(end)];
+        misEnd(sample) = missrateS3C(end);
     end
  
     
     
-    saveArr(cnt, 1) = mean(misEnd);
-    SSC(cnt,1) = mean(misArr(:,1));
+    saveArr(cnt, 1) = mean(misEnd)*100;
+%     SSC(cnt,1) = mean(misArr(:,1));
     % saveArr(cnt, 2) = median(misEnd);
     
     % figure, hold on

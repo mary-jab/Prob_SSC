@@ -22,6 +22,35 @@ elseif (strcmp(input{1}, 'syn') && strcmp(input{2}, 'intersect'))
     %     Y = reshape(( Y(:,:,1:numGrps)),n, N);
     savePath = ['savedRes/Intersect/cls'  num2str(opt.clas) '/Subspace_noise_' num2str(opt.noise) '/ambiant' num2str(opt.amb) '/'];
     
+elseif (strcmp(input{1}, 'motion'))
+    inputPath =  '..\GRealData\Hopkins155\';
+    d = dir(inputPath);
+    cnt = 0;
+    for i = 1:length(d)
+        if ( (d(i).isdir == 1) && ~strcmp(d(i).name,'.') && ~strcmp(d(i).name,'..') )
+            cnt = cnt+1;
+            if (cnt == opt.sample)
+                filepath = d(i).name;
+                f = dir([inputPath filepath]);
+                foundValidData = false;
+                for j = 1:length(f)
+                    if ( ~isempty(strfind(f(j).name,'_truth.mat')) )
+                        ind = j;
+                        foundValidData = true;
+                        break
+                    end
+                end
+                eval(['load ' [inputPath filepath '\' f(ind).name]]);
+                N = size(x,2);
+                F = size(x,3);
+                D = 2*F;
+                Y = reshape(permute(x(1:2,:,:),[1 3 2]),D,N);
+                break;
+            end
+        end
+    end
+    opt.clas = max(s);
+    savePath = ['savedRes/Hopkins/cls'  num2str(opt.clas) '/' filepath '/'];
     
 elseif (strcmp(input{1}, 'handwritten'))
     if ~isdeployed

@@ -3,6 +3,8 @@ sPath = [];
 if nargin<4
     iteration = 0;
 end
+missrate = round(missrate*100, 2);
+errorPre = round(errorPre,2);
 if nargin <5
     if isfield(dataInfoOpt, 'errorPrc')
         ttl = ['Intersect: ' num2str(dataInfoOpt.errorPrc) ', MissClassification: ' num2str(missrate)];
@@ -10,13 +12,16 @@ if nargin <5
         ttl = ['class: ' num2str(dataInfoOpt.k) ', MissClassification: ' num2str(missrate)];
     end
 elseif isfield(dataInfoOpt, 'errorPrc')
-    ttl = (['Intersect: ' num2str(dataInfoOpt.errorPrc) ', MissClassification: ' num2str(missrate) ', Nan: ' num2str(sum(isnan(errorPre)))]);
+    ttl = (['Intersect: ' num2str(dataInfoOpt.errorPrc) ', MissClassification: ' num2str(missrate) ', Nan: ' ((isnan(errorPre)))]);
 else
-    ttl = (['Class: ' num2str(dataInfoOpt.k) ', MissClassification: ' num2str(missrate) ', Nan: ' num2str(sum(isnan(errorPre)))]);
+    ttl = (['Class: ' num2str(dataInfoOpt.k) ', MissClassification: ' num2str(missrate) ', Nan: ' num2str(errorPre)]);
 end
 figure;
 subplot(121), imagesc(abs(QMat)*800);colorbar;
-subplot(122), imagesc(abs(ZKSym)*800);colorbar;
+for i=1:size(ZKSym,1)
+zz(i,:) = ZKSym(i,:)/norm(ZKSym(i,:),2);
+end
+subplot(122), imagesc((zz)*800);colorbar;
 set(gcf, 'Position', [400, 400, 1200, 400])
 
 title(ttl);

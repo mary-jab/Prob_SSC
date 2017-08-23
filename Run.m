@@ -18,16 +18,18 @@ opt.amb = 200;
 opt.ouliers = 0;
 opt.affine = 0;
 
+%% Motion Hopkin
+DataType{1} = 'motion';
 
 %% handwritten
 % DataType{1} = 'handwritten';
 
 %%
-for cls = 2:2
+for cls = 4:4
     opt.clas = cls;
-    for errorPrc = 40/100: 10/100:40/100
+    for errorPrc = 90/100: -10/100:70/100
         opt.noise =errorPrc;
-        for sample =1:50
+        for sample =1:20
             opt.sample = sample;
             [Y, opt.GrndTrth , opt.savePath] = ReadData (DataType, opt);
             k = max(opt.GrndTrth);
