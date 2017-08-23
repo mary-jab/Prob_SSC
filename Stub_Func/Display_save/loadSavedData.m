@@ -1,19 +1,19 @@
 clear all, close all
 for cls = 2:4
-saveArr = []; cnt = 0; S3C_list = [];
+    saveArr = []; cnt = 0; S3C_list = [];
     for noise = 40/100: 10/100:90/100
-%         loadPath = strcat(pwd,'\savedRes\GuassianNois\Cls_15\Subspace_noise_', num2str(noise), '\ambiant100');
-%         N = 150;
+        %         loadPath = strcat(pwd,'\savedRes\GuassianNois\Cls_15\Subspace_noise_', num2str(noise), '\ambiant100');
+        %         N = 150;
         cnt = cnt+1;
-        loadPath = strcat(pwd,'/savedRes/Intersect/cls' ,num2str(cls) ,'/Subspace_noise_', num2str(noise), '/ambiant200');
-        N = cls*100;
-        % cls = 2;
-        % loadPath = strcat(pwd,'\savedRes\\YaleBCrop025\Class_', num2str(cls));
-        % N = cls * 64;
+%         loadPath = strcat(pwd,'/savedRes/Intersect/cls' ,num2str(cls) ,'/Subspace_noise_', num2str(noise), '/ambiant200');
+%         N = cls*100;
+        cls = 2;
+        loadPath = strcat(pwd,'\savedRes\\YaleBCrop025\Class_', num2str(cls));
+        N = cls * 64;
         normType = 2;
         
         % misArr = zeros(20,10);
-        for sample = 1:20
+        for sample = 1:160
             nameF =strcat('normType', num2str(normType), 'N', num2str(N));
             nameF =strcat(nameF, 'sample', num2str(sample));
             nameF =strcat(nameF, '.mat');
@@ -21,10 +21,12 @@ saveArr = []; cnt = 0; S3C_list = [];
             misArr(sample, :) = [missrate, ones(1, 10-length(missrate))* missrate(end)];
             misEnd(sample) = missrate(end);
         end
+        
+        sz = 70;
         [a,  idx] = sort(misEnd);
-        misEnd(idx(21:end)) = [];
-        misArr((idx(21:end)),:) = [];
-        idxList(cnt, :) = idx(1:20);
+         misEnd(idx(sz:end)) = [];
+         misArr((idx(sz:end)),:) = [];
+        idxList(cnt, :) = idx(1:sz);
         
         probSCC_list(cnt, 1) = mean(misEnd)*100;
         %         SCC_list(cnt,1) = mean(misArr(:,1))*100;
@@ -42,21 +44,21 @@ saveArr = []; cnt = 0; S3C_list = [];
         SCC_list(cnt,1) = mean(SSC)*100;
         S3C_list(cnt,1) = mean(misS3C)*100;
         
-            figure, hold on, set(gca,'fontsize',18),
-    c = 'krbmkcrgbmkcrgbmkcrgbmkcrgbmkcrgbmkc';
-    x = 1:10;
-    str = [];
-    plot (x,mean(s3cArrmisArr), ':b+', 'LineWidth' , 2),str{1}= 'S^3C';
-    plot (x, mean(misArr), '-r*', 'LineWidth' , 2),str{2}= 'Prob SSC';
-    grid on
-    
-%     xlabel('%Intersect','fontsize', 20)
-%     ylabel('%mis-class','fontsize', 20)
-    legend(str)
-%     xlim([40,90])
-%     ylim([0 55])
-%     title(['#Classes: ' num2str(cls)])
-       
+        figure, hold on, set(gca,'fontsize',18),
+        c = 'krbmkcrgbmkcrgbmkcrgbmkcrgbmkcrgbmkc';
+        x = 1:10;
+        str = [];
+        plot (x,mean(s3cArrmisArr), ':b+', 'LineWidth' , 2),str{1}= 'S^3C';
+        plot (x, mean(misArr), '-r*', 'LineWidth' , 2),str{2}= 'Prob SSC';
+        grid on
+        
+        %     xlabel('%Intersect','fontsize', 20)
+        %     ylabel('%mis-class','fontsize', 20)
+        legend(str)
+        %     xlim([40,90])
+        %     ylim([0 55])
+        %     title(['#Classes: ' num2str(cls)])
+        
         
         
         

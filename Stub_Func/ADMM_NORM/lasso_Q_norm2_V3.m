@@ -33,7 +33,7 @@ if (nargin < 8)
 end
 if (nargin < 9)
     % default maximum number of iterations of ADMM
-    maxIter =400;
+    maxIter =200;
 end
 if (nargin < 10)
     % default coefficient error threshold to stop ADMM
